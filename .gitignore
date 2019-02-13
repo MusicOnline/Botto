@@ -1,0 +1,8 @@
+venv/
+resources/
+mypy.ini
+.pylintrc
+*.pyc
+*.log
+*.sublime-project
+*.sublime-workspace
