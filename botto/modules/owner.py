@@ -314,7 +314,6 @@ class Owner:
             "guild": ctx.guild,
             "message": ctx.message,
             "session": self.bot.session,
-            "db": self.bot.db,
             "_": self._last_result,
         }
         env.update(globals())
