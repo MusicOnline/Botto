@@ -35,8 +35,4 @@ bot.load_extension("botto.modules.events")
 bot.load_extension("botto.modules.owner")
 bot.load_extension("botto.modules.meta")
 
-try:
-    bot.run(config.BOT_TOKEN)
-except KeyboardInterrupt:
-    logger.info("Received KeyboardInterrupt signal to shutdown.")
-    bot.loop.run_until_complete(bot.shutdown())
+bot.run(config.BOT_TOKEN)
