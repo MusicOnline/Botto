@@ -1,5 +1,5 @@
 import functools
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Coroutine, Dict, Optional, Tuple, Union
 
 import aiohttp  # type: ignore
 
@@ -99,3 +99,32 @@ class Context(commands.Context):
             return await resp.json(
                 encoding=encoding, loads=loads, content_type=content_type
             )
+
+
+CoroType = Callable[..., Coroutine[Any, Any, Any]]
+CommandOrCoro = Union[CoroType, commands.Command]
+
+
+def lock_context() -> Callable[[CommandOrCoro], CommandOrCoro]:
+    """Lock context before running command."""
+
+    def wrapped(command_or_coro: CommandOrCoro) -> CommandOrCoro:
+        if isinstance(command_or_coro, commands.Command):
+            command: commands.Command = command_or_coro
+            old_callback: CoroType = command.callback
+        else:
+            old_callback = command_or_coro
+
+        @functools.wraps(old_callback)
+        async def wrapped_callback(*args: Any, **kwargs: Any):
+            ctx: Context = args[0] if isinstance(args[0], Context) else args[1]
+            ctx.lock()
+            await old_callback(*args, **kwargs)
+
+        try:
+            command.callback = wrapped_callback
+            return command
+        except NameError:
+            return wrapped_callback
+
+    return wrapped
