@@ -115,7 +115,10 @@ class Owner:
     @botto.command(name="cls", hidden=True)
     async def clear_terminal(self, ctx: botto.Context) -> None:
         """Clear terminal."""
-        os.system("cls")
+        if os.name == "nt":
+            os.system("cls")
+        else:
+            os.system("clear")
         await ctx.send("Cleared terminal buffer.")
 
     @botto.command(hidden=True)
