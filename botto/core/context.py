@@ -1,5 +1,4 @@
 import functools
-import os
 from typing import Any, Callable, Dict, Optional, Tuple
 
 import aiohttp  # type: ignore
@@ -46,10 +45,10 @@ class Context(commands.Context):
 
     async def mystbin(self, content: str) -> str:
         """Create a mystbin and return the url."""
-        url = "http://mystb.in/documents"
+        url = "https://mystb.in/documents"
         async with self.session.post(url, data=content.encode("utf-8")) as resp:
             response = await resp.json()
-            return f"http://mystb.in/{response['key']}"
+            return f"https://mystb.in/{response['key']}"
 
     async def gist(
         self,
