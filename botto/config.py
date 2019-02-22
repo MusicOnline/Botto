@@ -9,4 +9,4 @@ KEEP_ALIVE_CHANNEL = 0  # int
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 MAIN_COLOUR = 0xFFFFFF  # int or discord.Colour
-PREFIXES = ["botto "]  # List[int]
+PREFIXES = ["botto "]  # List[str]
