@@ -12,10 +12,11 @@ import botto
 logger = logging.getLogger(__name__)
 
 
-class Events:
+class Events(commands.Cog):
     def __init__(self, bot: botto.Botto) -> None:
         self.bot: botto.Botto = bot
 
+    @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         if message.author.bot or not message.content:
             return
@@ -30,15 +31,23 @@ class Events:
             except discord.Forbidden:
                 pass
 
+    @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild) -> None:
-        logger.info("Joined guild named '%s' (ID: %s).", guild, guild.id)
+        line = f"Joined guild named '{guild}' (ID: {guild.id})."
+        logger.info(line)
+        await self.bot.get_owner().send(line)
 
+    @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild) -> None:
-        logger.info("Removed from guild named '%s' (ID: %s).", guild, guild.id)
+        line = f"Removed from guild named '{guild}' (ID: {guild.id})."
+        logger.info(line)
+        await self.bot.get_owner().send(line)
 
+    @commands.Cog.listener()
     async def on_command(self, ctx: botto.Context) -> None:
         logger.info("Command '%s' was called by %s.", ctx.command, ctx.author)
 
+    @commands.Cog.listener()
     async def on_command_error(self, ctx: botto.Context, error: Exception) -> None:
         # error is not typehinted as commands.CommandError
         # because error.original is not one
@@ -74,17 +83,16 @@ class Events:
         if isinstance(error, ignored):
             return
 
+        full_tb: str = "".join(
+            traceback.format_exception(type(error), error, error.__traceback__)
+        )
         logger.error(
-            "Unhandled exception in '%s' command. (%s: %s)",
+            "Unhandled exception in '%s' command. (%s: %s)\n%s",
             ctx.command,
             error.__class__.__name__,
             error,
+            full_tb,
         )
-
-        exc_info: List[str] = traceback.format_exception(
-            type(error), error, error.__traceback__
-        )
-        logger.error("\n".join(exc_info))
 
         embed: discord.Embed = discord.Embed(
             colour=discord.Colour.red(),
@@ -104,13 +112,19 @@ class Events:
             pass
 
         # Log error to console channel
-        formatted_exc = botto.utils.hidden_format_exc(error, limit=5)
+        mystbin_url = await ctx.mystbin(full_tb)
+        partial_tb: str = "".join(
+            traceback.format_exception(type(error), error, error.__traceback__, limit=5)
+        )
         embed = discord.Embed(
             colour=discord.Colour.red(),
-            description=f"```py\n{botto.utils.limit_str(formatted_exc, 2000)}\n```",
+            description=(
+                f"```py\n{botto.utils.limit_str(partial_tb, 1900)}\n```\n"
+                f"Full traceback: {mystbin_url}"
+            ),
             timestamp=ctx.message.created_at,
         )
-        embed.set_author(name=f"An Error Occured - {type(error).__name__}")
+        embed.set_author(name=f"Unexpected Exception - {type(error).__name__}")
         embed.set_footer(text=f"From command '{ctx.command}'")
         embed.add_field(
             name="Command Caller",

@@ -24,7 +24,7 @@ class Context(commands.Context):
     # ------ General and simple methods ------
 
     async def run_in_exec(self, func: Callable, *args: Any, **kwargs: Any) -> Any:
-        partial = functools.partial(func, *args, **kwargs)
+        partial: functools.partial[Any] = functools.partial(func, *args, **kwargs)
         return await self.bot.loop.run_in_executor(None, partial)
 
     # ------ Context locking ------
@@ -45,7 +45,7 @@ class Context(commands.Context):
 
     async def mystbin(self, content: str) -> str:
         """Create a mystbin and return the url."""
-        url = "https://mystb.in/documents"
+        url: str = "https://mystb.in/documents"
         async with self.session.post(url, data=content.encode("utf-8")) as resp:
             response = await resp.json()
             return f"https://mystb.in/{response['key']}"
@@ -59,11 +59,13 @@ class Context(commands.Context):
         """Create a GitHub gist and return the url."""
         if not botto.config.GITHUB_TOKEN:
             raise ValueError("GITHUB_TOKEN not set in config file.")
-        url = "https://api.github.com/gists"
+        url: str = "https://api.github.com/gists"
+        headers: Dict[str, str]
         headers = {"Authorization": f"token {botto.config.GITHUB_TOKEN}"}
+        _files: Dict[str, Dict[str, str]]
         _files = {file[0]: {"content": file[1]} for file in files}
 
-        data = {"files": _files, "public": public}
+        data: dict = {"files": _files, "public": public}
         if description is not None:
             data.update(description=description)
 
@@ -116,7 +118,7 @@ def lock_context() -> Callable[[CommandOrCoro], CommandOrCoro]:
             old_callback = command_or_coro
 
         @functools.wraps(old_callback)
-        async def wrapped_callback(*args: Any, **kwargs: Any):
+        async def wrapped_callback(*args: Any, **kwargs: Any) -> None:
             ctx: Context = args[0] if isinstance(args[0], Context) else args[1]
             ctx.lock()
             await old_callback(*args, **kwargs)

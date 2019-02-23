@@ -1,6 +1,6 @@
 import os
 
-BOT_TOKEN = os.getenv("TOKEN")
+BOT_TOKEN = os.getenv("BOTTO_TOKEN")
 DATABASE_URI = os.getenv("DB")
 
 OWNER_ID = 0  # int

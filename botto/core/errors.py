@@ -5,19 +5,19 @@ from discord.ext import commands  # type: ignore
 
 class BotMissingFundamentalPermissions(commands.CheckFailure):
     def __init__(self, missing_perms: List[str], *args: Any) -> None:
-        self.missing_perms = missing_perms
-        self.send_messages = "send_messages" not in missing_perms
+        self.missing_perms: List[str] = missing_perms
+        self.send_messages: bool = "send_messages" not in missing_perms
 
-        missing = [
+        missing: List[str] = [
             perm.replace("_", " ").replace("guild", "server").title()
             for perm in missing_perms
         ]
 
         if len(missing) > 2:
-            fmt = "{}, and {}".format(", ".join(missing[:-1]), missing[-1])
+            fmt: str = "{}, and {}".format(", ".join(missing[:-1]), missing[-1])
         else:
             fmt = " and ".join(missing)
 
-        message = f"Botto requires {fmt} permission(s) to function."
+        message: str = f"Botto requires {fmt} permission(s) to function."
 
         super().__init__(message, *args)

@@ -1,5 +1,6 @@
 import asyncio
 import copy
+import datetime
 import io
 import logging
 import os
@@ -10,26 +11,27 @@ import textwrap
 import time
 from contextlib import redirect_stdout
 from subprocess import Popen, PIPE
-from typing import Any, Dict, List, Match, Optional
+from typing import Any, Dict, List, Match, Optional, Tuple
 
 import aiohttp  # type: ignore
 import import_expression  # type: ignore
 
 import discord  # type: ignore
+from discord.ext import commands  # type: ignore
 
 import botto
 
 logger = logging.getLogger(__name__)
 
 
-class Owner:
+class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     """Developer and owner-only commands."""
 
     def __init__(self, bot: botto.Botto) -> None:
         self.bot: botto.Botto = bot
         self._last_result: Optional[Any] = None
 
-    async def __local_check(self, ctx: botto.Context) -> bool:
+    async def cog_check(self, ctx: botto.Context) -> bool:
         return await self.bot.is_owner(ctx.author)
 
     @staticmethod
@@ -48,6 +50,7 @@ class Owner:
             origin += f" of '{ctx.guild}'"
         return origin
 
+    @commands.Cog.listener()
     async def on_raw_reaction_add(
         self, payload: discord.RawReactionActionEvent
     ) -> None:
@@ -59,7 +62,7 @@ class Owner:
             return
 
         channel: botto.utils.OptionalChannel = self.bot.get_channel(payload.channel_id)
-        assert channel is not None
+        assert isinstance(channel, discord.abc.Messageable)
         message: discord.Message = await channel.get_message(payload.message_id)
 
         if message.author != self.bot.user or not message.embeds:
@@ -100,19 +103,19 @@ class Owner:
             await message.edit(embed=embed)
             await message.remove_reaction("\N{WASTEBASKET}", self.bot.user)
             await message.remove_reaction(
-                "\N{WASTEBASKET}", discord.Object(self.bot.owner_id)
+                "\N{WASTEBASKET}", discord.Object(payload.user_id)
             )
         except (discord.Forbidden, discord.NotFound):
             pass
 
     # ------ Simple commands ------
 
-    @botto.command(hidden=True)
+    @botto.command()
     async def echo(self, ctx: botto.Context, *, content: str) -> None:
         """Echo a message."""
         await ctx.send(content)
 
-    @botto.command(name="cls", hidden=True)
+    @botto.command(name="cls")
     async def clear_terminal(self, ctx: botto.Context) -> None:
         """Clear terminal."""
         if os.name == "nt":
@@ -121,13 +124,13 @@ class Owner:
             os.system("clear")
         await ctx.send("Cleared terminal buffer.")
 
-    @botto.command(hidden=True)
+    @botto.command()
     async def shutdown(self, ctx: botto.Context) -> None:
         """Disconnect the bot from Discord and ends its processes."""
         await ctx.send("Shutdown initiated.")
         await self.bot.shutdown()
 
-    @botto.command(hidden=True)
+    @botto.command()
     async def logs(self, ctx: botto.Context) -> None:
         """DM bot logs."""
         with open("botto.log") as file:
@@ -136,7 +139,7 @@ class Owner:
             await ctx.author.send(f"Logs: {mystbin}")
             await ctx.message.add_reaction("\N{OPEN MAILBOX WITH RAISED FLAG}")
 
-    @botto.command(hidden=True, aliases=["runas"])
+    @botto.command(aliases=["runas"])
     async def pseudo(
         self, ctx: botto.Context, user: discord.Member, *, message: str
     ) -> None:
@@ -148,12 +151,12 @@ class Owner:
 
     # ------ Module loading ------
 
-    @botto.command(hidden=True)
+    @botto.command()
     async def modules(self, ctx: botto.Context) -> None:
         """Show loaded modules."""
         await ctx.send("\n".join(self.bot.extensions.keys()))
 
-    @botto.command(hidden=True)
+    @botto.command()
     async def load(self, ctx: botto.Context, module: str) -> None:
         """Load a module."""
         if not module.startswith("botto.modules."):
@@ -162,7 +165,7 @@ class Owner:
         self.bot.load_extension(module)
         await ctx.send(f"Successfully loaded '{module}' module.")
 
-    @botto.command(hidden=True)
+    @botto.command()
     async def unload(self, ctx: botto.Context, module: str) -> None:
         """Unload a module."""
         if not module.startswith("botto.modules."):
@@ -171,7 +174,7 @@ class Owner:
         self.bot.unload_extension(module)
         await ctx.send(f"Successfully unloaded '{module}' module.")
 
-    @botto.command(hidden=True)
+    @botto.command()
     async def reload(self, ctx: botto.Context, module: str) -> None:
         """Reload a module."""
         if not module.startswith("botto.modules."):
@@ -183,18 +186,18 @@ class Owner:
 
     # ------ Profile editing ------
 
-    @botto.group(hidden=True, invoke_without_command=True)
+    @botto.group(invoke_without_command=True)
     async def edit(self, ctx: botto.Context) -> None:
         """Edit the bot's profile attributes."""
         await ctx.send("Please call a subcommand.")
 
-    @edit.command(hidden=True)
+    @edit.command()
     async def username(self, ctx: botto.Context, *, name: str) -> None:
         """Change the bot's username."""
         await self.bot.user.edit(username=name)
         await ctx.send(f"Client's username is now {self.bot.user}.")
 
-    @edit.command(hidden=True)
+    @edit.command()
     async def avatar(self, ctx: botto.Context, *, url: Optional[str] = None) -> None:
         """Change the bot's avatar."""
         avatar: Optional[bytes] = None
@@ -203,7 +206,7 @@ class Owner:
         elif ctx.message.attachments:
             avatar = await ctx.get_as_bytes(ctx.message.attachments[0].url)
         if avatar is None:
-            await ctx.success("No image was passed.")
+            await ctx.send("No image was passed.")
             return
 
         await self.bot.user.edit(avatar=avatar)
@@ -211,22 +214,22 @@ class Owner:
 
     # ------ Testing errors ------
 
-    @botto.command(hidden=True)
+    @botto.command()
     async def testerror(self, ctx: botto.Context) -> None:
         """Test response on unexpected error."""
         raise RuntimeError("This is a test error.")
 
-    @botto.command(hidden=True)
+    @botto.command()
     async def testfundamentalerror(self, ctx: botto.Context) -> None:
         """Test response when bot is missing fundamental permissions."""
         raise botto.BotMissingFundamentalPermissions(["abstract_authority"])
 
     # ------ Code ------
 
-    @botto.command(hidden=True)
+    @botto.command()
     async def codestats(self, ctx: botto.Context) -> None:
         """Show code statistics of the bot."""
-        lines = {"py": 0}
+        lines: Dict[str, int] = {"py": 0}
 
         for root, _, files in os.walk("."):
             if any(path in root for path in [".git", "__pycache__"]):
@@ -236,7 +239,7 @@ class Owner:
                 if not filename.endswith(tuple(f".{ext}" for ext in lines)):
                     continue
 
-                f_ext = filename.split(".")[-1]
+                f_ext: str = filename.split(".")[-1]
                 with open(os.path.join(root, filename), encoding="utf-8") as file:
                     lines[f_ext] += len(file.readlines())
 
@@ -246,7 +249,7 @@ class Owner:
 
     # ------ Eval commands ------
 
-    @botto.command(hidden=True)
+    @botto.command()
     async def shell(self, ctx: botto.Context, *, command: str) -> None:
         """Run a shell command."""
 
@@ -256,15 +259,15 @@ class Owner:
 
         await ctx.message.add_reaction(botto.aLOADING)
         command = self._cleanup_code(command)
-        argv = shlex.split(command)
-        start = time.perf_counter()
+        argv: List[str] = shlex.split(command)
+        start: float = time.perf_counter()
         stdout, stderr = await self.bot.loop.run_in_executor(None, run_shell, argv)
-        delta = (time.perf_counter() - start) * 1000
-        timestamp = ctx.message.created_at
+        delta: float = (time.perf_counter() - start) * 1000
+        timestamp: datetime.datetime = ctx.message.created_at
         await ctx.message.remove_reaction(botto.aLOADING, ctx.me)
 
-        result = ["```"]
-        to_upload = [("command.txt", command)]
+        result: List[str] = ["```"]
+        to_upload: List[Tuple[str, str]] = [("command.txt", command)]
         if stdout:
             result.append(f"stdout:\n{stdout}")
             to_upload.append(("stdout.txt", stdout))
@@ -279,11 +282,11 @@ class Owner:
         if len(result) == 2:
             return
 
-        result_string = "\n".join(result)
-        is_uploaded = False
+        result_string: str = "\n".join(result)
+        is_uploaded: bool = False
 
         if len(result_string) > 2048:
-            url = await ctx.gist(
+            url: str = await ctx.gist(
                 *to_upload,
                 description=(
                     f"Shell command results from {self._get_origin(ctx)} "
@@ -293,7 +296,7 @@ class Owner:
             result_string = f"Results too long. View them [here]({url})."
             is_uploaded = True
 
-        embed = discord.Embed(
+        embed: discord.Embed = discord.Embed(
             description=result_string,
             timestamp=timestamp,
             colour=botto.config.MAIN_COLOUR,
@@ -305,7 +308,7 @@ class Owner:
         if is_uploaded:
             await message.add_reaction("\N{WASTEBASKET}")
 
-    @botto.command(hidden=True, name="eval")
+    @botto.command(name="eval")
     async def eval_command(self, ctx: botto.Context, *, code: str) -> None:
         """Evaluate a block of code."""
         await ctx.message.add_reaction(botto.aLOADING)
@@ -321,8 +324,8 @@ class Owner:
         }
         env.update(globals())
         code = self._cleanup_code(code)
-        stdout = io.StringIO()
-        to_compile = f"async def func():\n{textwrap.indent(code, '  ')}"
+        stdout: io.StringIO = io.StringIO()
+        to_compile: str = f"async def func():\n{textwrap.indent(code, '  ')}"
 
         # Defining the async function.
         try:
@@ -340,9 +343,9 @@ class Owner:
 
         # Executing the async function.
         try:
-            start = time.perf_counter()
+            start: float = time.perf_counter()
             with redirect_stdout(stdout):
-                ret = await func()
+                ret: Any = await func()
         except Exception as exc:  # pylint: disable=broad-except
             try:
                 await ctx.message.remove_reaction(botto.aLOADING, ctx.me)
@@ -353,8 +356,8 @@ class Owner:
             return
 
         # When code execution is successful
-        delta = (time.perf_counter() - start) * 1000
-        value = stdout.getvalue()
+        delta: float = (time.perf_counter() - start) * 1000
+        value: str = stdout.getvalue()
 
         # Try to unreact
         try:
@@ -363,25 +366,23 @@ class Owner:
         except discord.NotFound:
             if not value and ret is None:
                 await ctx.send(
-                    f"{ctx.author.mention} Code execution completed "
-                    f"in {delta:.2f} ms.",
-                    delete_after=60,
+                    f"{ctx.author.mention} Code execution completed in {delta:.2f} ms."
                 )
 
         if not value and ret is None:
             return
 
         # If there is stdout and return value
-        embed = discord.Embed(
+        embed: discord.Embed = discord.Embed(
             timestamp=ctx.message.created_at, colour=botto.config.MAIN_COLOUR
         )
         embed.set_author(name="Code Evaluation")
         embed.set_footer(
-            text=(f"Took {delta:.2f} ms " f"with Python {platform.python_version()}")
+            text=f"Took {delta:.2f} ms with Python {platform.python_version()}"
         )
 
-        result = ["```py"]
-        to_upload = [("code.py", code)]
+        result: List[str] = ["```py"]
+        to_upload: List[Tuple[str, str]] = [("code.py", code)]
         if value:
             result.append(f"# stdout:\n{value}")
             to_upload.append(("stdout.txt", value))
@@ -391,11 +392,11 @@ class Owner:
             to_upload.append(("return.py", repr(ret)))
         result.append("```")
 
-        result_string = "\n".join(result)
-        is_uploaded = False
+        result_string: str = "\n".join(result)
+        is_uploaded: bool = False
 
         if len(result_string) > 2048:
-            url = await ctx.gist(
+            url: str = await ctx.gist(
                 *to_upload,
                 description=(
                     f"Eval command results from {self._get_origin(ctx)} "

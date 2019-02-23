@@ -42,11 +42,8 @@ class Command(commands.Command):
 
 class GroupMixin(commands.GroupMixin):
     def command(self, *args, **kwargs):
-        """A shortcut decorator that invokes :func:`.command` and adds it to
-        the internal command list via :meth:`~.GroupMixin.add_command`.
-        """
-
         def decorator(func):
+            kwargs.setdefault("parent", self)
             result = command(*args, **kwargs)(func)
             self.add_command(result)
             return result
@@ -54,11 +51,8 @@ class GroupMixin(commands.GroupMixin):
         return decorator
 
     def group(self, *args, **kwargs):
-        """A shortcut decorator that invokes :func:`.group` and adds it to
-        the internal command list via :meth:`~.GroupMixin.add_command`.
-        """
-
         def decorator(func):
+            kwargs.setdefault("parent", self)
             result = group(*args, **kwargs)(func)
             self.add_command(result)
             return result
@@ -66,10 +60,16 @@ class GroupMixin(commands.GroupMixin):
         return decorator
 
 
-class Group(GroupMixin, Command, commands.Group):
-    def __init__(self, **attrs):
+class Group(GroupMixin, Command):
+    def __init__(self, *args, **attrs):
         self.invoke_without_command = attrs.pop("invoke_without_command", False)
-        super().__init__(**attrs)
+        super().__init__(*args, **attrs)
+
+    def copy(self):
+        ret = super().copy()
+        for cmd in self.commands:
+            ret.add_command(cmd.copy())
+        return ret
 
     async def invoke(self, ctx):
         early_invoke = not self.invoke_without_command
@@ -118,9 +118,7 @@ class Group(GroupMixin, Command, commands.Group):
 
         if early_invoke:
             try:
-                await self.callback(  # pylint: disable=not-callable
-                    *ctx.args, **ctx.kwargs
-                )
+                await self.callback(*ctx.args, **ctx.kwargs)
             except:
                 ctx.command_failed = True
                 raise

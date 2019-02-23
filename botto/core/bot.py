@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import itertools
 import logging
-from typing import Any, Generator, Optional
+from typing import Any, Generator, List, Optional, Set
 
 import aiohttp  # type: ignore
 import pkg_resources
@@ -62,13 +62,13 @@ class Botto(commands.AutoShardedBot):
         assert isinstance(self.ready_time, datetime.datetime)
         return datetime.datetime.utcnow() - self.ready_time
 
-    def humanise_uptime(self, *, brief: bool = False) -> str:
+    def humanize_uptime(self, *, brief: bool = False) -> str:
         hours, remainder = divmod(int(self.uptime.total_seconds()), 3600)
         minutes, seconds = divmod(remainder, 60)
         days, hours = divmod(hours, 24)
 
         if not brief:
-            fmt = "{h} hours, {m} minutes, and {s} seconds"
+            fmt: str = "{h} hours, {m} minutes, and {s} seconds"
             if days:
                 fmt = "{d} days, " + fmt
         else:
@@ -81,7 +81,7 @@ class Botto(commands.AutoShardedBot):
     def get_owner(self) -> discord.User:
         if not botto.config.OWNER_ID:
             raise ValueError("OWNER_ID not set in config file.")
-        owner = self.get_user(botto.config.OWNER_ID)
+        owner: Optional[discord.User] = self.get_user(botto.config.OWNER_ID)
         if owner is None:
             raise ValueError("Could not find owner in user cache.")
         return owner
@@ -93,7 +93,7 @@ class Botto(commands.AutoShardedBot):
         if self.loop.is_closed():
             return  # we're already cleaning up
 
-        task = self.loop.create_task(self.shutdown())
+        task: asyncio.Task = self.loop.create_task(self.shutdown())
 
         def _silence_gathered(fut: asyncio.Future) -> None:
             try:
@@ -104,7 +104,7 @@ class Botto(commands.AutoShardedBot):
                 self.loop.stop()
 
         def when_future_is_done(fut: asyncio.Future) -> None:
-            pending = asyncio.Task.all_tasks(loop=self.loop)
+            pending: Set[asyncio.Task] = asyncio.Task.all_tasks(loop=self.loop)
             if pending:
                 logger.info("Cleaning up after %s tasks.", len(pending))
                 gathered = asyncio.gather(*pending, loop=self.loop)
@@ -143,7 +143,7 @@ class Botto(commands.AutoShardedBot):
     async def process_commands(self, message: discord.Message) -> None:
         if message.author.bot:
             return
-        ctx = await self.get_context(message, cls=Context)
+        ctx: Context = await self.get_context(message, cls=Context)
         if ctx.is_locked():
             return
         await self.invoke(ctx)
@@ -165,7 +165,7 @@ class Botto(commands.AutoShardedBot):
 
         actual_perms = ctx.channel.permissions_for(ctx.me)
 
-        missing = [
+        missing: List[str] = [
             perm
             for perm, value in required_perms
             if value is True and getattr(actual_perms, perm) is not True

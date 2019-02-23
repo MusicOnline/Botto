@@ -1,6 +1,5 @@
 from discord import PartialEmoji  # type: ignore
 
-# Custom emoji example:
 aLOADING = PartialEmoji(True, "loading", 420942895638642699)
 
 CHECK = PartialEmoji(False, "check", 474939098075758604)
