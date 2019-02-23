@@ -225,5 +225,10 @@ class Botto(commands.AutoShardedBot):
 
         for i in itertools.count():
             if not self.is_closed():
-                await channel.send(f"Keeping alive, #{i}")
+                try:
+                    await channel.send(f"Keeping alive, #{i}")
+                except asyncio.CancelledError:
+                    return
+                except Exception:
+                    pass
             await asyncio.sleep(5)
