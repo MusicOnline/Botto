@@ -1,4 +1,5 @@
-from typing import Dict, Iterator, List, Sequence, Tuple, Union
+import inspect
+from typing import Dict, Iterator, List, Optional, Sequence, Tuple, Union
 
 import discord  # type: ignore
 from discord.ext import commands  # type: ignore
@@ -12,7 +13,7 @@ class Meta(commands.Cog):
     def __init__(self, bot: botto.Botto) -> None:
         self.bot: botto.Botto = bot
         self.owner_show_hidden: bool = False
-        self.cog_order: List[str] = ["Meta", "Owner", "Jishaku"]
+        self.cog_order: List[str] = ["Meta", "Owner"]
 
     def get_statistics_embed(self) -> discord.Embed:
         total_members: int = sum(1 for m in self.bot.get_all_members())
@@ -105,9 +106,11 @@ class Meta(commands.Cog):
     def _format_cmd_list(self, ctx: botto.Context) -> discord.Embed:
         cmd_list: Iterator[commands.Command] = self._filter_cmd_list(ctx, ctx.bot)
         sorted_list: List[commands.Command] = self._sort_cmd_list(cmd_list)
-        p: str = botto.config.PREFIXES[
-            0
-        ] if botto.config.PREFIXES else f"@{ctx.bot.user.name} "
+        p: str = (
+            botto.config.PREFIXES[0]
+            if botto.config.PREFIXES
+            else f"@{ctx.bot.user.name} "
+        )
 
         categories: Dict[str, List[str]] = {}
         for cmd in sorted_list:
@@ -124,52 +127,78 @@ class Meta(commands.Cog):
         )
         return embed
 
-    # TODO: Dealing with pagination properly with too much cogs!
     @botto.command(name="help")
     async def help_cmd(self, ctx: botto.Context, *command: str) -> None:
         """Show help."""
         embed: discord.Embed = discord.Embed(colour=botto.config.MAIN_COLOUR)
-        p: str = botto.config.PREFIXES[
-            0
-        ] if botto.config.PREFIXES else f"@{ctx.bot.user.name} "
+        p: str = (
+            botto.config.PREFIXES[0]
+            if botto.config.PREFIXES
+            else f"@{ctx.bot.user.name} "
+        )
 
         def handle_command_embed(cmd: botto.Command) -> None:
-            embed.set_author(name=cmd.signature_without_aliases)
+            embed.set_author(name=p + cmd.signature_without_aliases)
             embed.description = cmd.help
             if cmd.aliases:
                 embed.add_field(name="Aliases", value=" / ".join(cmd.aliases))
 
             if isinstance(cmd, botto.Group):
-                subcmds = sorted(cmd.commands, key=lambda c: c.name)
+                subcmds: List[botto.Command] = sorted(
+                    cmd.commands, key=lambda c: c.name
+                )
                 paged_subcmds = (subcmds[c : c + 5] for c in range(0, len(subcmds), 5))
                 for i, page in enumerate(paged_subcmds, 1):
                     lines: List[str] = []
                     for subcmd in page:
                         lines.append(f"`{p}{subcmd}` — {subcmd.short_doc or 'TBA'}")
-                    total_entries = len(subcmds)
-                    min_index = 1 + (i - 1) * 5
-                    max_index = min((i - 1) * 5, total_entries)
-                    indices = f"{min_index} - {max_index} out of {total_entries}"
+                    total_entries: int = len(subcmds)
+                    min_index: int = 1 + (i - 1) * 5
+                    max_index: int = min((i - 1) * 5, total_entries)
+                    index_str: str = f"{min_index} - {max_index} out of {total_entries}"
                     embed.add_field(
-                        name=f"Subcommands ({indices})", value="\n".join(lines)
+                        name=f"Subcommands ({index_str})", value="\n".join(lines)
                     )
 
+        def handle_cog_embed(cog: commands.Cog) -> None:
+            cmd_list: List[commands.Command] = list(self._filter_cmd_list(ctx, cog))
+            if not cmd_list:
+                return  # Act as if this cog does not exist (hide it away)
+            cmd_list = sorted(cmd_list, key=lambda cmd: cmd.name)
+            embed.set_author(name=f"{name} Commands")
+            embed.set_footer(
+                text=(f"Use '{p}help [cmd]' for more information on a command.")
+            )
+            cog_desc: Optional[str] = inspect.getdoc(cog)
+            if cog_desc is None:
+                embed.description = "\n".join(
+                    f"`{p}{c}` — {c.short_doc or 'TBA'}" for c in cmd_list
+                )
+                if len(embed.description) <= 2048:
+                    return
+            embed.description = cog_desc
+            paged_cmds = (cmd_list[c : c + 5] for c in range(0, len(cmd_list), 5))
+            for i, page in enumerate(paged_cmds, 1):
+                lines: List[str] = []
+                for cmd in page:
+                    lines.append(f"`{p}{cmd}` — {cmd.short_doc or 'TBA'}")
+                total_entries: int = len(cmd_list)
+                min_index: int = 1 + (i - 1) * 5
+                max_index: int = min((i - 1) * 5, total_entries)
+                index_str: str = f"{min_index} - {max_index} out of {total_entries}"
+                embed.add_field(name=f"Commands ({index_str})", value="\n".join(lines))
+
         if not command:
+            # TODO: Dealing with pagination properly with too much cogs!
+            # Field value limit: 1024
+            # Total character limit: 6000
+            # Change self._format_cmd_list to return List[discord.Embed].
             embed = self._format_cmd_list(ctx)
         elif len(command) == 1:
-            name = command[0]
+            name: str = command[0]
             cog = self.bot.get_cog(name)
             if cog is not None and name in self.cog_order:
-                cmd_list: List[commands.Command] = list(self._filter_cmd_list(ctx, cog))
-                if cmd_list:
-                    cmd_list = sorted(cmd_list, key=lambda cmd: cmd.name)
-                    embed.set_author(name=f"{name} Commands")
-                    embed.set_footer(
-                        text=(f"Use '{p}help [cmd]' for more information on a command.")
-                    )
-                    embed.description = "\n".join(
-                        f"`{p}{c}` — {c.short_doc or 'TBA'}" for c in cmd_list
-                    )
+                handle_cog_embed(cog)
 
             cmd = self.bot.get_command(name.lower())
             if not embed.author and isinstance(cmd, botto.Command):
