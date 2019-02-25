@@ -147,6 +147,22 @@ class Meta(commands.Cog):
                 subcmds: List[botto.Command] = sorted(
                     cmd.commands, key=lambda c: c.name
                 )
+                subcmd_entries_str: str = "\n".join(
+                    f"`{p}{c}` — {c.short_doc or 'TBA'}" for c in subcmds
+                )
+                if len(subcmd_entries_str) <= 1024:
+                    # Try to show subcommands in one field.
+                    embed.add_field(name="Subcommands", value=subcmd_entries_str)
+                    return
+
+                # If we can't show all subcommands in one field, we paginate using
+                # fields every 5 subcommands.
+                # Assumptions:
+                # 1. 5 (subcommands + short_doc) is within 1024 characters.
+                # 2. We never hit the 6000 character limit.
+                # If assumptions fail, we should shorten that horrendously long
+                # short_doc or split the subcommands into their own commands.
+
                 paged_subcmds = (subcmds[c : c + 5] for c in range(0, len(subcmds), 5))
                 for i, page in enumerate(paged_subcmds, 1):
                     lines: List[str] = []
@@ -154,7 +170,7 @@ class Meta(commands.Cog):
                         lines.append(f"`{p}{subcmd}` — {subcmd.short_doc or 'TBA'}")
                     total_entries: int = len(subcmds)
                     min_index: int = 1 + (i - 1) * 5
-                    max_index: int = min((i - 1) * 5, total_entries)
+                    max_index: int = min(i * 5, total_entries)
                     index_str: str = f"{min_index} - {max_index} out of {total_entries}"
                     embed.add_field(
                         name=f"Subcommands ({index_str})", value="\n".join(lines)
@@ -170,12 +186,31 @@ class Meta(commands.Cog):
                 text=(f"Use '{p}help [cmd]' for more information on a command.")
             )
             cog_desc: Optional[str] = inspect.getdoc(cog)
-            if cog_desc is None:
-                embed.description = "\n".join(
-                    f"`{p}{c}` — {c.short_doc or 'TBA'}" for c in cmd_list
-                )
-                if len(embed.description) <= 2048:
-                    return
+            cmd_entries_str: str = "\n".join(
+                f"`{p}{c}` — {c.short_doc or 'TBA'}" for c in cmd_list
+            )
+            if cog_desc is None and len(cmd_entries_str) <= 2048:
+                # If there's no cog description, try to show commands in description.
+                embed.description = cmd_entries_str
+                return
+            if cog_desc is not None and len(cmd_entries_str) <= 1024:
+                # If there's a cog description, try to show commands in one field.
+                embed.description = cog_desc
+                embed.add_field(name="Commands", value=cmd_entries_str)
+                return
+
+            # If there's a cog description, and we can't show all commands in one field,
+            # we paginate using fields every 5 commands.
+            # Assumptions:
+            # 1. (5 commands + short_doc) is within 1024 characters.
+            # 2. We never hit the 6000 character limit.
+            # If assumptions fail, we should shorten that horrendously long short_doc
+            # or split the commands into more cogs.
+
+            # TODO: Consider cog embeds allowing thumbnails and images.
+            # Have them in the last two lines of the cog description, then parse them
+            # functionally. (Saves the effort of subclassing Cog or CogMeta.)
+
             embed.description = cog_desc
             paged_cmds = (cmd_list[c : c + 5] for c in range(0, len(cmd_list), 5))
             for i, page in enumerate(paged_cmds, 1):
@@ -184,7 +219,7 @@ class Meta(commands.Cog):
                     lines.append(f"`{p}{cmd}` — {cmd.short_doc or 'TBA'}")
                 total_entries: int = len(cmd_list)
                 min_index: int = 1 + (i - 1) * 5
-                max_index: int = min((i - 1) * 5, total_entries)
+                max_index: int = min(i * 5, total_entries)
                 index_str: str = f"{min_index} - {max_index} out of {total_entries}"
                 embed.add_field(name=f"Commands ({index_str})", value="\n".join(lines))
 
