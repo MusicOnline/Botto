@@ -20,14 +20,23 @@ class Events(commands.Cog):
     async def on_message(self, message: discord.Message) -> None:
         if message.author.bot or not message.content:
             return
+        # Note: Change this if not using commands.when_mentioned_or(*prefixes).
+        if botto.config.PREFIXES:
+            content = (
+                f"My commands prefixes are {self.bot.user.mention} and "
+                f"`{botto.config.PREFIXES[0]}`. Commands can be viewed using the "
+                f"`{botto.config.PREFIXES[0]}help` command."
+            )
+        else:
+            content = (
+                f"My command prefix is {self.bot.user.mention}. Commands can be viewed "
+                f"using the `@{self.bot.user.name} help` command."
+            )
 
         mentions: List[str] = [f"<@{self.bot.user.id}>", f"<@!{self.bot.user.id}>"]
         if message.content in mentions:
             try:
-                await message.channel.send(
-                    f"Hello! My command prefixes are {self.bot.user.mention} "
-                    f"and `botto`. Commands can be viewed with the help command."
-                )
+                await message.channel.send("Hello! " + content)
             except discord.Forbidden:
                 pass
 
