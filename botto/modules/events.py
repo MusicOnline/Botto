@@ -81,11 +81,40 @@ class Events(commands.Cog):
             )
             return
 
+        if isinstance(error, commands.BadArgument):
+            error_msg = str(error)
+            bad_conv = botto.utils.is_conversion_err(error)
+            if bad_conv:
+                conv_type, param = bad_conv
+                if conv_type == "int":
+                    error_msg = f'Failed to convert parameter "{param}" to an integer.'
+                elif conv_type == "float":
+                    error_msg = (
+                        f'Failed to convert parameter "{param}" to a number with or '
+                        f"without decimals."
+                    )
+            await ctx.send(
+                f"You passed a bad argument. Here's how bad it is.\n"
+                f"```\n{error_msg}\n```"
+            )
+            return
+
         if isinstance(error, commands.CheckFailure):
             message: str = str(error)
             if message and not message.startswith("The check functions for command"):
                 await ctx.send(message)
             return
+
+        if isinstance(error, discord.HTTPException):
+            too_long = botto.utils.is_too_long_err(error)
+            if too_long:
+                content_type, length = too_long
+                await ctx.send(
+                    f"Tried to send a message with '{content_type}' of size over "
+                    f"{length} and failed. If you think this shouldn't have "
+                    f"happened, please report this to the developer."
+                )
+                return
 
         ignored = (commands.CommandNotFound,)
 
