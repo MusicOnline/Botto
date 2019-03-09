@@ -42,9 +42,15 @@ class Botto(commands.AutoShardedBot):
             loop=self.loop, json_serialize=json.dumps, raise_for_status=True
         )
 
-        self.activity: discord.Activity = discord.Activity(
-            name="@Botto", type=discord.ActivityType.listening
-        )
+        # Note: Change this if not using commands.when_mentioned_or(*prefixes).
+        if botto.config.PREFIXES:
+            self.activity: discord.Activity = discord.Activity(
+                name=botto.config.PREFIXES[0], type=discord.ActivityType.listening
+            )
+        else:
+            self.activity: discord.Activity = discord.Activity(
+                name="@mention", type=discord.ActivityType.listening
+            )
 
         self.remove_command("help")
         self.add_check(self._check_fundamental_permissions)
