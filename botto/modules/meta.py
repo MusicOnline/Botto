@@ -138,7 +138,7 @@ class Meta(commands.Cog):
         )
 
         def handle_command_embed(cmd: botto.Command) -> None:
-            embed.set_author(name=p + cmd.signature_without_aliases)
+            embed.set_author(name=p + cmd.signature)
             embed.description = cmd.help
             if cmd.aliases:
                 embed.add_field(name="Aliases", value=" / ".join(cmd.aliases))

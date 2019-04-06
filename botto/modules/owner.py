@@ -63,7 +63,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
         channel: botto.utils.OptionalChannel = self.bot.get_channel(payload.channel_id)
         assert isinstance(channel, discord.abc.Messageable)
-        message: discord.Message = await channel.get_message(payload.message_id)
+        message: discord.Message = await channel.fetch_message(payload.message_id)
 
         if message.author != self.bot.user or not message.embeds:
             return
@@ -180,8 +180,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         if not module.startswith("botto.modules."):
             module = f"botto.modules.{module}"
 
-        self.bot.unload_extension(module)
-        self.bot.load_extension(module)
+        self.bot.reload_extension(module)
         await ctx.send(f"Successfully reloaded '{module}' module.")
 
     # ------ Profile editing ------

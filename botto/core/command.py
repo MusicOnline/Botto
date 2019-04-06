@@ -5,39 +5,7 @@ from discord.ext.commands.core import hooked_wrapped_callback  # type: ignore
 
 
 class Command(commands.Command):
-    @property
-    def signature_without_aliases(self) -> str:
-        """Returns a POSIX-like signature useful for help command output."""
-        result = []
-        parent = self.full_parent_name
-        name = self.name if not parent else parent + " " + self.name
-        result.append(name)
-
-        if self.usage is not None:
-            result.append(self.usage)
-            return " ".join(result)
-
-        params = self.clean_params
-        if not params:
-            return " ".join(result)
-
-        for name, param in params.items():
-            if param.default is not param.empty:
-                should_print = (
-                    param.default
-                    if isinstance(param.default, str)
-                    else param.default is not None
-                )
-                if should_print:
-                    result.append(f"[{name}={param.default}]")
-                else:
-                    result.append(f"[{name}]" % name)
-            elif param.kind == param.VAR_POSITIONAL:
-                result.append(f"[{name}...]")
-            else:
-                result.append(f"<{name}>")
-
-        return " ".join(result)
+    pass
 
 
 class GroupMixin(commands.GroupMixin):
