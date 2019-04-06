@@ -3,6 +3,7 @@ import logging
 import traceback
 from typing import List
 
+import aiohttp
 import discord  # type: ignore
 from discord.ext import commands  # type: ignore
 
@@ -150,7 +151,10 @@ class Events(commands.Cog):
             pass
 
         # Log error to console channel
-        mystbin_url = await ctx.mystbin(full_tb)
+        try:
+            mystbin_url = await ctx.mystbin(full_tb)
+        except aiohttp.ClientResponseError:
+            mystbin_url = "Failed to create mystbin."
         partial_tb: str = "".join(
             traceback.format_exception(type(error), error, error.__traceback__, limit=5)
         )
