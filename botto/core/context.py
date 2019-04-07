@@ -75,21 +75,21 @@ class Context(commands.Context):
 
     # ------ GET request wrappers ------
 
-    async def get_as_bytes(self, url: str, **kwargs: Any) -> bytes:
+    async def get_as_bytes(self, url: Any, **kwargs: Any) -> bytes:
         """Send a GET request and return the response as bytes."""
-        async with self.session.get(url, **kwargs) as resp:
+        async with self.session.get(str(url), **kwargs) as resp:
             return await resp.read()
 
     async def get_as_text(
-        self, url: str, encoding: Optional[str] = None, **kwargs: Any
+        self, url: Any, encoding: Optional[str] = None, **kwargs: Any
     ) -> str:
         """Send a GET request and return the response as text."""
-        async with self.session.get(url, **kwargs) as resp:
+        async with self.session.get(str(url), **kwargs) as resp:
             return await resp.text(encoding=encoding)
 
     async def get_as_json(
         self,
-        url: str,
+        url: Any,
         *,
         encoding: Optional[str] = None,
         loads: Callable[[str], Any] = json.loads,
@@ -97,7 +97,7 @@ class Context(commands.Context):
         **kwargs: Any,
     ) -> Any:
         """Send a GET request and return the response as json."""
-        async with self.session.get(url, **kwargs) as resp:
+        async with self.session.get(str(url), **kwargs) as resp:
             return await resp.json(
                 encoding=encoding, loads=loads, content_type=content_type
             )
