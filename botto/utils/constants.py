@@ -4,7 +4,7 @@ from discord import PartialEmoji  # type: ignore
 
 TRANSPARENT_DARK = 0x36393E
 
-aLOADING = PartialEmoji(True, "loading", 420942895638642699)
+aLOADING = PartialEmoji(animated=True, name="loading", id=420942895638642699)
 
-CHECK = PartialEmoji(False, "check", 474939098075758604)
-CROSS = PartialEmoji(False, "cross", 474939098625474560)
+CHECK = PartialEmoji(animated=False, name="check", id=474939098075758604)
+CROSS = PartialEmoji(animated=False, name="cross", id=474939098625474560)
