@@ -1,4 +1,5 @@
 import inspect
+import platform
 from typing import Dict, Iterator, List, Optional, Sequence, Tuple, Union
 
 import discord  # type: ignore
@@ -72,6 +73,13 @@ class Meta(commands.Cog):
         )
         embed.add_field(name="Connection", value=f"{ping} ms current")
         embed.add_field(name="Process", value=f"{cpu_usage}% CPU\n{ram_usage:.2f} MiB")
+
+        embed.set_footer(
+            text=(
+                f"Made with discord.py {discord.__version__}, Python "
+                f"{platform.python_version()} and love."
+            )
+        )
 
         return embed
 

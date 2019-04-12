@@ -5,7 +5,6 @@ import logging
 from typing import Any, Generator, List, Optional, Set
 
 import aiohttp  # type: ignore
-import pkg_resources
 import psutil  # type: ignore
 
 import discord  # type: ignore
@@ -33,8 +32,6 @@ class Botto(commands.AutoShardedBot):
         )
         self.ready_time: Optional[datetime.datetime] = None
         self.keep_alive_task: Optional[asyncio.Task] = None
-
-        self.dpy_version: str = pkg_resources.get_distribution("discord.py").version
 
         self.process: psutil.Process = psutil.Process()
 
