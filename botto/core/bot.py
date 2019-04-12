@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import itertools
 import logging
-from typing import Any, Generator, List, Optional, Set
+from typing import Any, Generator, List, Optional
 
 import aiohttp  # type: ignore
 import psutil  # type: ignore
