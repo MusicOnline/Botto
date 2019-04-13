@@ -1,3 +1,4 @@
+import random
 import re
 import sys
 import traceback
@@ -49,3 +50,8 @@ def is_conversion_err(error: Exception) -> Optional[Tuple[str, int]]:
     if match:
         return (match.group(1), match.group(2))
     return None
+
+
+def get_random_colour() -> discord.Colour:
+    """Get a colour with random hue, full saturation and value."""
+    return discord.Colour.from_hsv(random.random(), 1, 1)
