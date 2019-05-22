@@ -49,7 +49,6 @@ class Botto(commands.AutoShardedBot):
                 name="@mention", type=discord.ActivityType.listening
             )
 
-        self.remove_command("help")
         self.add_check(self._check_fundamental_permissions)
         self.after_invoke(self.unlock_after_invoke)
 

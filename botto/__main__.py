@@ -34,5 +34,6 @@ bot.load_extension("jishaku")
 bot.load_extension("botto.modules.events")
 bot.load_extension("botto.modules.owner")
 bot.load_extension("botto.modules.meta")
+bot.load_extension("botto.modules.help")
 
 bot.run(config.BOT_TOKEN)
