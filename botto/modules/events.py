@@ -78,7 +78,7 @@ class Events(commands.Cog):
             await ctx.send(
                 f"You missed the `{error.param.name}` argument. "
                 f"Here's the correct usage for the command.\n"
-                f"```\n{ctx.prefix}{ctx.command.signature}\n```"
+                f"```\n{ctx.prefix}{ctx.command} {ctx.command.signature}\n```"
             )
             return
 
