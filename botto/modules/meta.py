@@ -104,10 +104,20 @@ class Meta(commands.Cog):
         """Show invite link of the bot."""
         await ctx.send(f"<{discord.utils.oauth_url(ctx.me.id)}>")
 
+    @botto.command()
+    async def source(self, ctx: botto.Context) -> None:
+        """Show GitHub link to source code."""
+        await ctx.send("https://github.com/MusicOnline/Botto")
+
     @botto.command(aliases=["suggest", "feedback", "report", "contact"])
     async def support(self, ctx: botto.Context) -> None:
         """Show support server link."""
         await ctx.send("Contact Music#9755 here: https://discord.gg/wp7Wxzs")
+
+    @botto.command(enabled=False)
+    async def vote(self, ctx: botto.Context) -> None:
+        """Support the bot by voting!"""
+        pass
 
 
 def setup(bot: botto.Botto) -> None:
