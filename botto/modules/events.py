@@ -74,6 +74,30 @@ class Events(commands.Cog):
             await ctx.send("Tick tock. You took too long.")
             return
 
+        if isinstance(error, commands.DisabledCommand):
+            if hasattr(error, "disabled_reason"):
+                await ctx.send(
+                    "This command has been disabled by the bot owner with the reason:\n"
+                    + error.disabled_reason
+                )
+            else:
+                await ctx.send("This command has been disabled by the bot owner.")
+            return
+
+        if isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(
+                f"You are on cooldown. Retry in {error.retry_after:.1} second(s)."
+            )
+            return
+
+        if isinstance(error, botto.SubcommandRequired):
+            help_command = self.bot.help_command.copy()
+            help_command.context = ctx
+            await ctx.send(
+                "Please use one of the subcommands listed below.",
+                embed=help_command.get_command_help(ctx.command),
+            )
+
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(
                 f"You missed the `{error.param.name}` argument. "

@@ -21,3 +21,7 @@ class BotMissingFundamentalPermissions(commands.CheckFailure):
         message: str = f"Botto requires {fmt} permission(s) to function."
 
         super().__init__(message, *args)
+
+
+class SubcommandRequired(commands.CommandError):
+    pass
