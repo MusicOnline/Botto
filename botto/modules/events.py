@@ -95,7 +95,7 @@ class Events(commands.Cog):
             help_command.context = ctx
             await ctx.send(
                 "Please use one of the subcommands listed below.",
-                embed=help_command.get_command_help(ctx.command),
+                embed=await help_command.get_command_help(ctx.command),
             )
             return
 
