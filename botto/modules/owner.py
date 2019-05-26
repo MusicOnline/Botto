@@ -188,7 +188,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
     @botto.group(invoke_without_command=True)
     async def edit(self, ctx: botto.Context) -> None:
         """Edit the bot's profile attributes."""
-        await ctx.send("Please call a subcommand.")
+        raise botto.SubcommandRequired
 
     @edit.command()
     async def username(self, ctx: botto.Context, *, name: str) -> None:
