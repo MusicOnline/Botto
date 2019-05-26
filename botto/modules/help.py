@@ -175,6 +175,7 @@ class HelpCommand(commands.HelpCommand):
                 embed.add_field(
                     name="Aliases", value=" // ".join(command.aliases), inline=False
                 )
+            return embed
         items = yaml.full_load(docstring.format(command=command))  # value substitution
         if not isinstance(items, dict):
             # For docstrings without format (eg. third party commands like jishaku)
