@@ -1,9 +1,9 @@
 import inspect
-import yaml
 from typing import Any, Dict, List, Optional
 
 import discord  # type: ignore
 from discord.ext import commands  # type: ignore
+import yaml
 
 import botto
 
@@ -69,21 +69,20 @@ class HelpCommand(commands.HelpCommand):
         if not isinstance(items, dict):
             # For docstrings without format (eg. third party commands like jishaku)
             return None
-        else:
-            embed = discord.Embed(
-                colour=items.pop("colour", self.colour),
-                description=items.pop("description", "No description available."),
-            )
-            embed.set_author(name=items.pop("name", cog.qualified_name))
-            embed.set_footer(text=items.pop("footer", ""))
-            embed.set_thumbnail(url=items.pop("thumbnail", ""))
-            embed.set_image(url=items.pop("image", ""))
-            items.pop("short", None)
-            for k, v in items.items():
-                inline = k.endswith(" (inline)")
-                if inline:
-                    k = k[:-9]
-                embed.add_field(name=k, value=v, inline=inline)
+        embed = discord.Embed(
+            colour=items.pop("colour", self.colour),
+            description=items.pop("description", "No description available."),
+        )
+        embed.set_author(name=items.pop("name", cog.qualified_name))
+        embed.set_footer(text=items.pop("footer", ""))
+        embed.set_thumbnail(url=items.pop("thumbnail", ""))
+        embed.set_image(url=items.pop("image", ""))
+        items.pop("short", None)
+        for k, v in items.items():
+            inline = k.endswith(" (inline)")
+            if inline:
+                k = k[:-9]
+            embed.add_field(name=k, value=v, inline=inline)
         return embed
 
     async def get_cog_help(self, cog: commands.Cog) -> List[discord.Embed]:
@@ -107,6 +106,8 @@ class HelpCommand(commands.HelpCommand):
             if embed:
                 embeds.append(embed)
         cmds = await self.filter_commands(cog.get_commands())
+        if not cmds:
+            return []
         if embeds:
             before = embed.copy()
         else:
@@ -255,7 +256,7 @@ class HelpCommand(commands.HelpCommand):
         return f"No command called `{string}` found."
 
     def subcommand_not_found(self, command: commands.Command, string: str) -> str:
-        if isinstance(command, commands.Group) and len(command.all_commands) > 0:
+        if isinstance(command, commands.Group) and command.all_commands:
             return (
                 f"Command `{command.qualified_name}` has no subcommand named "
                 f"`{string}`."
@@ -270,7 +271,7 @@ def setup(bot: botto.Botto) -> None:
     bot.old_help_command = bot.help_command
     bot.help_command = HelpCommand(
         colour=botto.config.MAIN_COLOUR,
-        show_hidden=True,
+        verify_checks=False,
         command_attrs={"help": "Show help information."},
     )
 
