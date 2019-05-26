@@ -75,10 +75,10 @@ class Events(commands.Cog):
             return
 
         if isinstance(error, commands.DisabledCommand):
-            if hasattr(error, "disabled_reason"):
+            if hasattr(ctx.command, "disabled_reason"):
                 await ctx.send(
                     "This command has been disabled by the bot owner with the reason:\n"
-                    + error.disabled_reason
+                    + ctx.command.disabled_reason
                 )
             else:
                 await ctx.send("This command has been disabled by the bot owner.")
@@ -97,6 +97,7 @@ class Events(commands.Cog):
                 "Please use one of the subcommands listed below.",
                 embed=help_command.get_command_help(ctx.command),
             )
+            return
 
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(
