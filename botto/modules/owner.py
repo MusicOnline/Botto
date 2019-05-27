@@ -240,7 +240,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
                 f_ext: str = filename.split(".")[-1]
                 with open(os.path.join(root, filename), encoding="utf-8") as file:
-                    lines[f_ext] += sum(1 for line in file.readlines() if line)
+                    lines[f_ext] += sum(1 for line in file.readlines() if line != "\n")
 
                 await asyncio.sleep(0)
 
