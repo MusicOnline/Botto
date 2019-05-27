@@ -107,6 +107,8 @@ class HelpCommand(commands.HelpCommand):
                 embeds.append(embed)
         cmds = await self.filter_commands(cog.get_commands())
         if not cmds:
+            error = self.command_not_found(cog.qualified_name)
+            await self.send_error_message(error)
             return []
         if embeds:
             before = embed.copy()
