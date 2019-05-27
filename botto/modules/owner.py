@@ -231,7 +231,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         lines: Dict[str, int] = {"py": 0}
 
         for root, _, files in os.walk("."):
-            if any(path in root for path in [".git", "__pycache__"]):
+            if any(path in root for path in [".git", "__pycache__", "venv"]):
                 continue
 
             for filename in files:
@@ -240,7 +240,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
                 f_ext: str = filename.split(".")[-1]
                 with open(os.path.join(root, filename), encoding="utf-8") as file:
-                    lines[f_ext] += len(file.readlines())
+                    lines[f_ext] += sum(1 for line in file.readlines() if line)
 
                 await asyncio.sleep(0)
 
