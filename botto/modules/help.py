@@ -271,7 +271,7 @@ class HelpCommand(commands.HelpCommand):
 
 
 def setup(bot: botto.Botto) -> None:
-    bot.old_help_command = bot.help_command
+    bot._old_help_command = bot.help_command
     bot.help_command = HelpCommand(
         colour=botto.config.MAIN_COLOUR,
         verify_checks=False,
@@ -280,4 +280,5 @@ def setup(bot: botto.Botto) -> None:
 
 
 def teardown(bot: botto.Botto) -> None:
-    bot.help_command = bot.old_help_command
+    bot.help_command = bot._old_help_command
+    del bot._old_help_command
