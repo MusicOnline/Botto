@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-import itertools
 import logging
 from typing import Any, Generator, List, Optional
 
@@ -9,6 +8,7 @@ import psutil  # type: ignore
 
 import discord  # type: ignore
 from discord.ext import commands  # type: ignore
+from discord.ext import tasks  # type: ignore
 
 import botto
 from .context import Context
@@ -38,19 +38,13 @@ class Botto(commands.AutoShardedBot):
         self.session: aiohttp.ClientSession = aiohttp.ClientSession(
             loop=self.loop, json_serialize=json.dumps, raise_for_status=True
         )
-
-        # Note: Change this if not using commands.when_mentioned_or(*prefixes).
-        if botto.config.PREFIXES:
-            self.activity: discord.Activity = discord.Activity(
-                name=botto.config.PREFIXES[0], type=discord.ActivityType.listening
-            )
-        else:
-            self.activity: discord.Activity = discord.Activity(
-                name="@mention", type=discord.ActivityType.listening
-            )
+        self.activity: discord.Activity = discord.Activity(
+            name="@mention", type=discord.ActivityType.listening
+        )
 
         self.add_check(self._check_fundamental_permissions)
         self.after_invoke(self.unlock_after_invoke)
+        self.maintain_presence.start()
 
     # ------ Properties ------
 
@@ -91,8 +85,7 @@ class Botto(commands.AutoShardedBot):
     # ------ Basic methods ------
 
     async def close(self) -> None:
-        if self.keep_alive_task is not None:
-            self.keep_alive_task.cancel()
+        self.maintain_presence.stop()
 
         for ext in tuple(self.extensions):
             self.unload_extension(ext)
@@ -161,10 +154,6 @@ class Botto(commands.AutoShardedBot):
     # ------ Event listeners ------
 
     async def on_ready(self) -> None:
-        if self.keep_alive_task is not None:
-            self.keep_alive_task.cancel()
-        self.keep_alive_task = self.loop.create_task(self.keep_alive())
-
         self.ready_time = datetime.datetime.utcnow()
         logger.info("Bot has connected.")
         try:
@@ -176,21 +165,7 @@ class Botto(commands.AutoShardedBot):
 
     # ------ Other ------
 
-    async def keep_alive(self) -> None:
-        """Background task for the bot not to enter a sleepish state when inactive."""
-        channel: botto.utils.OptionalChannel = self.get_channel(
-            botto.config.KEEP_ALIVE_CHANNEL
-        )
-        if channel is None:
-            return
-        assert isinstance(channel, discord.abc.Messageable)
-
-        for i in itertools.count():
-            if not self.is_closed():
-                try:
-                    await channel.send(f"Keeping alive, #{i}")
-                except asyncio.CancelledError:
-                    return
-                except Exception:
-                    pass
-            await asyncio.sleep(5)
+    @tasks.loop(minutes=5)
+    async def maintain_presence(self):
+        if self.guilds[0].me.activity is None:
+            await self.change_presence(activity=self.activity)
