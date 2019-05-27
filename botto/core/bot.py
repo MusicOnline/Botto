@@ -31,7 +31,6 @@ class Botto(commands.AutoShardedBot):
             **kwargs,
         )
         self.ready_time: Optional[datetime.datetime] = None
-        self.keep_alive_task: Optional[asyncio.Task] = None
 
         self.process: psutil.Process = psutil.Process()
 
