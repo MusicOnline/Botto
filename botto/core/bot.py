@@ -84,7 +84,7 @@ class Botto(commands.AutoShardedBot):
     # ------ Basic methods ------
 
     async def close(self) -> None:
-        self.maintain_presence.stop()
+        self.maintain_presence.cancel()
 
         for ext in tuple(self.extensions):
             self.unload_extension(ext)
