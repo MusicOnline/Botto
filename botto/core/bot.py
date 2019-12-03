@@ -90,9 +90,9 @@ class Botto(commands.AutoShardedBot):
 
     async def send_console(self, *args, **kwargs) -> discord.Message:
         try:
-            return await self.get_console_channel.send(*args, **kwargs)
+            return await self.get_console_channel().send(*args, **kwargs)
         except ValueError:
-            return await self.get_owner.send(*args, **kwargs)
+            return await self.get_owner().send(*args, **kwargs)
 
     # ------ Basic methods ------
 
