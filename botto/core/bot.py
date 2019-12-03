@@ -80,6 +80,20 @@ class Botto(commands.AutoShardedBot):
             raise ValueError("Could not find owner in user cache.")
         return owner
 
+    def get_console_channel(self) -> botto.utils.AnyChannel:
+        if not botto.config.CONSOLE_CHANNEL_ID:
+            raise ValueError("CONSOLE_CHANNEL_ID not set in config file.")
+        channel: botto.utils.OptionalChannel = self.get_channel(botto.config.CONSOLE_CHANNEL_ID)
+        if channel is None:
+            raise ValueError("Could not find console channel in channel cache.")
+        return channel
+
+    async def send_console(self, *args, **kwargs) -> discord.Message:
+        try:
+            return await self.get_console_channel.send(*args, **kwargs)
+        except ValueError:
+            return await self.get_owner.send(*args, **kwargs)
+
     # ------ Basic methods ------
 
     async def close(self) -> None:
@@ -159,7 +173,7 @@ class Botto(commands.AutoShardedBot):
         except KeyError:
             embed = None
             logger.warning("Meta cog was not found, statistics embed will not be sent.")
-        await self.get_owner().send("Bot has connected.", embed=embed)
+        await self.send_console("Bot has connected.", embed=embed)
 
     # ------ Other ------
 

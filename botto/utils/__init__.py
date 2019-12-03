@@ -8,12 +8,16 @@ import discord  # type: ignore
 
 from .paginator import EmbedPaginator
 
-OptionalChannel = Union[
+AnyChannel = Union[
     discord.TextChannel,
     discord.VoiceChannel,
     discord.CategoryChannel,
     discord.DMChannel,
     discord.GroupChannel,
+]
+
+OptionalChannel = Union[
+    AnyChannel,
     None,
 ]
 
