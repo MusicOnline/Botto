@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import logging
 import traceback
 from typing import List
@@ -45,13 +46,23 @@ class Events(commands.Cog):
     async def on_guild_join(self, guild: discord.Guild) -> None:
         line = f"Joined guild named '{guild}' (ID: {guild.id})."
         logger.info(line)
-        await self.bot.get_owner().send(line)
+        embed: discord.Embed = discord.Embed(
+            colour=discord.Colour.green(),
+            tiemstamp=datetime.datetime.utcnow(),
+            description=line,
+        )
+        await self.bot.send_console(embed=embed)
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild) -> None:
         line = f"Removed from guild named '{guild}' (ID: {guild.id})."
         logger.info(line)
-        await self.bot.get_owner().send(line)
+        embed: discord.Embed = discord.Embed(
+            colour=discord.Colour.yellow(),
+            tiemstamp=datetime.datetime.utcnow(),
+            description=line,
+        )
+        await self.bot.send_console(embed=embed)
 
     @commands.Cog.listener()
     async def on_command(self, ctx: botto.Context) -> None:
@@ -219,7 +230,7 @@ class Events(commands.Cog):
             inline=False,
         )
 
-        await self.bot.get_owner().send(embed=embed)
+        await self.bot.send_console(embed=embed)
 
 
 def setup(bot: botto.Botto) -> None:

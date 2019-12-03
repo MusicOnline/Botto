@@ -1,4 +1,5 @@
 import platform
+import datetime
 
 import discord  # type: ignore
 from discord.ext import commands  # type: ignore
@@ -33,7 +34,6 @@ class Meta(commands.Cog):
             for channel in self.bot.get_all_channels()
             if isinstance(channel, discord.VoiceChannel)
         )
-        total_channels: int = text_channels + voice_channels
 
         total_guilds: int = self.bot.guild_count
         assert self.bot.ready_time is not None
@@ -43,7 +43,10 @@ class Meta(commands.Cog):
             cpu_usage: float = self.bot.process.cpu_percent()
             ram_usage: float = self.bot.process.memory_full_info().uss / 2 ** 20
 
-        embed: discord.Embed = discord.Embed(colour=botto.config.MAIN_COLOUR)
+        embed: discord.Embed = discord.Embed(
+            colour=botto.config.MAIN_COLOUR,
+            tiemstamp=datetime.datetime.utcnow()
+        )
         embed.add_field(
             name="Member Stats",
             value=(
@@ -53,14 +56,20 @@ class Meta(commands.Cog):
             ),
         )
         embed.add_field(
-            name="Channel Stats",
+            name="Guild Stats",
             value=(
-                f"{total_channels} total\n"
+                f"{total_guilds} guilds\n"
                 f"{text_channels} text channels\n"
                 f"{voice_channels} voice channels"
             ),
         )
-        embed.add_field(name="Other Stats", value=f"{total_guilds} guilds")
+        embed.add_field(
+            name="Versions",
+            value=(
+                f"Python {platform.python_version()}\n"
+                f"discord.py {discord.__version__}"
+            ),
+        )
         embed.add_field(
             name="Uptime",
             value=(
@@ -76,6 +85,7 @@ class Meta(commands.Cog):
                 f"{platform.python_version()} and love."
             )
         )
+        embed.set_thumbnail(url=self.bot.user.avatar_url)
 
         return embed
 
