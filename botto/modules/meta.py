@@ -45,7 +45,7 @@ class Meta(commands.Cog):
 
         embed: discord.Embed = discord.Embed(
             colour=botto.config.MAIN_COLOUR,
-            tiemstamp=datetime.datetime.utcnow()
+            timestamp=datetime.datetime.utcnow()
         )
         embed.add_field(
             name="Member Stats",
@@ -79,12 +79,6 @@ class Meta(commands.Cog):
         embed.add_field(name="Connection", value=f"{ping} ms current")
         embed.add_field(name="Process", value=f"{cpu_usage}% CPU\n{ram_usage:.2f} MiB")
 
-        embed.set_footer(
-            text=(
-                f"Made with discord.py {discord.__version__}, Python "
-                f"{platform.python_version()} and love."
-            )
-        )
         embed.set_thumbnail(url=self.bot.user.avatar_url)
 
         return embed

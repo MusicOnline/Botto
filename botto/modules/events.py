@@ -48,7 +48,7 @@ class Events(commands.Cog):
         logger.info(line)
         embed: discord.Embed = discord.Embed(
             colour=discord.Colour.green(),
-            tiemstamp=datetime.datetime.utcnow(),
+            timestamp=datetime.datetime.utcnow(),
             description=line,
         )
         await self.bot.send_console(embed=embed)
@@ -59,7 +59,7 @@ class Events(commands.Cog):
         logger.info(line)
         embed: discord.Embed = discord.Embed(
             colour=discord.Colour.yellow(),
-            tiemstamp=datetime.datetime.utcnow(),
+            timestamp=datetime.datetime.utcnow(),
             description=line,
         )
         await self.bot.send_console(embed=embed)
