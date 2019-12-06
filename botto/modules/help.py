@@ -206,6 +206,10 @@ class HelpCommand(commands.HelpCommand):
                 if inline:
                     k = k[:-9]
                 embed.add_field(name=k, value=v, inline=inline)
+            if command.aliases and items.pop("add_aliases", True):
+                embed.add_field(
+                    name="Aliases", value=" // ".join(command.aliases), inline=False
+                )
         return embed
 
     async def get_command_help(self, command: commands.Command) -> discord.Embed:
