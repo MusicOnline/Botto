@@ -153,7 +153,7 @@ class Events(commands.Cog):
                 )
                 return
 
-        ignored = (commands.CommandNotFound,)
+        ignored = (commands.CommandNotFound, discord.Forbidden)
 
         if isinstance(error, ignored):
             return
