@@ -36,9 +36,6 @@ class Botto(commands.AutoShardedBot):
         self.session: aiohttp.ClientSession = aiohttp.ClientSession(
             loop=self.loop, json_serialize=json.dumps, raise_for_status=True
         )
-        self.activity: discord.Activity = discord.Activity(
-            name="@mention", type=discord.ActivityType.listening
-        )
 
         self.add_check(self._check_fundamental_permissions)
         self.after_invoke(self.unlock_after_invoke)
@@ -179,5 +176,9 @@ class Botto(commands.AutoShardedBot):
 
     @tasks.loop(minutes=5)
     async def maintain_presence(self):
-        if self.guilds[0].me.activity is None:
-            await self.change_presence(activity=self.activity)
+        if self.guilds and self.guilds[0].me.activity is None:
+            await self.change_presence(
+                activity=discord.Activity(
+                    name=f"@{self.user.name}", type=discord.ActivityType.listening
+                )
+            )
