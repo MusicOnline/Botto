@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import logging
 from typing import Any, Generator, List, Optional
@@ -176,7 +177,9 @@ class Botto(commands.AutoShardedBot):
 
     @tasks.loop(minutes=5)
     async def maintain_presence(self):
-        if self.guilds and self.guilds[0].me.activity is None:
+        while not self.guilds:
+            await asyncio.sleep(1)
+        if self.guilds[0].me.activity is None:
             await self.change_presence(
                 activity=discord.Activity(
                     name=f"@{self.user.name}", type=discord.ActivityType.listening
