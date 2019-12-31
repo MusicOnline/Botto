@@ -277,7 +277,7 @@ class HelpCommand(commands.HelpCommand):
 def setup(bot: botto.Botto) -> None:
     bot._old_help_command = bot.help_command
     bot.help_command = HelpCommand(
-        colour=botto.config.MAIN_COLOUR,
+        colour=botto.config["MAIN_COLOUR"],
         verify_checks=False,
         command_attrs={"help": "Show help information."},
     )

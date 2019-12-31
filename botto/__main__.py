@@ -36,4 +36,4 @@ bot.load_extension("botto.modules.owner")
 bot.load_extension("botto.modules.meta")
 bot.load_extension("botto.modules.help")
 
-bot.run(config.BOT_TOKEN)
+bot.run(config["TOKEN"])

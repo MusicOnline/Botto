@@ -1,0 +1,25 @@
+# Discord API token of the bot to login
+TOKEN: token  # str
+
+# Database URI in the format of postgres://user:password@host:port/database
+# Leave as null if database connection not needed
+DATABASE_URI: null  # Optional[str]
+
+# Discord user ID of the bot owner
+OWNER_ID: 0  # int
+
+# Discord channel ID of a text channel to send "console" messages to
+# Leave as null to send the messages to the owner's DM 
+CONSOLE_CHANNEL_ID: 0  # Optional[int]
+
+# GitHub API token for the owner module
+GITHUB_TOKEN: token  # str
+
+# Main colour value for embeds and such
+MAIN_COLOUR: 0xFFFFFF  # int
+
+# Command prefixes in addition to mentions
+# Leave as [] to only use mentions
+PREFIXES:  # List[str]
+    - "botto "
+    - "bot!"

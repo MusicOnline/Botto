@@ -23,11 +23,11 @@ class Events(commands.Cog):
         if message.author.bot or not message.content:
             return
         # Note: Change this if not using commands.when_mentioned_or(*prefixes).
-        if botto.config.PREFIXES:
+        if (prefixes := botto.config["PREFIXES"]):
             content = (
                 f"My commands prefixes are {self.bot.user.mention} and "
-                f"`{botto.config.PREFIXES[0]}`. Commands can be viewed using the "
-                f"`{botto.config.PREFIXES[0]}help` command."
+                f"`{prefixes[0]}`. Commands can be viewed using the "
+                f"`{prefixes[0]}help` command."
             )
         else:
             content = (

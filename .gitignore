@@ -1,7 +1,12 @@
-venv/
-mypy.ini
-.pylintrc
+config.yaml
+
 *.pyc
 *.log
+
+venv/
+.mypy_cache/
+.vscode/
 *.sublime-project
 *.sublime-workspace
+mypy.ini
+.pylintrc

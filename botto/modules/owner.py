@@ -24,7 +24,7 @@ import botto
 logger = logging.getLogger(__name__)
 
 
-class Owner(commands.Cog, command_attrs=dict(hidden=True)):
+class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
     """Developer and owner-only commands."""
 
     def __init__(self, bot: botto.Botto) -> None:
@@ -73,13 +73,13 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         )
         if match is None:
             return
-        if not botto.config.GITHUB_TOKEN:
+        if not (github_token := botto.config["GITHUB_TOKEN"]):
             raise ValueError("GITHUB_TOKEN not set in config file.")
 
         gist_id: str = match.group(1)
         url: str = f"https://api.github.com/gists/{gist_id}"
         headers: Dict[str, str] = {
-            "Authorization": f"token {botto.config.GITHUB_TOKEN}"
+            "Authorization": f"token {github_token}"
         }
 
         try:
@@ -298,7 +298,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
         embed: discord.Embed = discord.Embed(
             description=result_string,
             timestamp=timestamp,
-            colour=botto.config.MAIN_COLOUR,
+            colour=botto.config["MAIN_COLOUR"],
         )
         embed.set_author(name="Shell Command Results")
         embed.set_footer(text=f"Took {delta:.2f} ms")
@@ -373,7 +373,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):
 
         # If there is stdout and return value
         embed: discord.Embed = discord.Embed(
-            timestamp=ctx.message.created_at, colour=botto.config.MAIN_COLOUR
+            timestamp=ctx.message.created_at, colour=botto.config["MAIN_COLOUR"]
         )
         embed.set_author(name="Code Evaluation")
         embed.set_footer(

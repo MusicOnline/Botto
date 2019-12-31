@@ -82,7 +82,7 @@ class EmbedPaginator:  # pylint: disable=too-many-instance-attributes
         pages += bool(left_over)
         self.current_page = 0
         self.maximum_pages = pages
-        self.embed = discord.Embed(colour=botto.config.MAIN_COLOUR)
+        self.embed = discord.Embed(colour=botto.config["MAIN_COLOUR"])
         self.paginating = len(entries) > per_page
         self.match = None
         self.reaction_emojis = [
