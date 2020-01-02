@@ -8,7 +8,7 @@ GitHub source: https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/utils/pagin
 
 import asyncio
 
-import discord  # type: ignore
+import discord
 
 import botto
 
@@ -21,7 +21,7 @@ STOP_PAGINATION = "\N{BLACK SQUARE FOR STOP}"
 GOTO_HELP = "\N{WHITE QUESTION MARK ORNAMENT}"
 
 
-class EmbedPaginator:  # pylint: disable=too-many-instance-attributes
+class EmbedPaginator:
     """Implements a paginator that queries the user for the pagination interface.
 
     Pages are 1-index based, not 0-index based.
@@ -200,7 +200,7 @@ class EmbedPaginator:  # pylint: disable=too-many-instance-attributes
 
         try:
             await self.channel.delete_messages(to_delete)
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             pass
 
     async def show_help(self):
@@ -234,7 +234,7 @@ class EmbedPaginator:  # pylint: disable=too-many-instance-attributes
     async def remove_reactions(self, *, individually=True):
         try:
             await self.message.clear_reactions()
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             if not individually:
                 return
 
@@ -244,7 +244,7 @@ class EmbedPaginator:  # pylint: disable=too-many-instance-attributes
                     continue
                 try:
                     await self.message.remove_reaction(reaction, self.ctx.me)
-                except Exception:  # pylint: disable=broad-except
+                except Exception:
                     pass
 
     def react_check(self, reaction, user):

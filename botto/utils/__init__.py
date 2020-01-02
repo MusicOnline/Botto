@@ -4,7 +4,7 @@ import sys
 import traceback
 from typing import Any, List, Match, Optional, Tuple, Union
 
-import discord  # type: ignore
+import discord
 
 from .paginator import EmbedPaginator
 
@@ -16,10 +16,7 @@ AnyChannel = Union[
     discord.GroupChannel,
 ]
 
-OptionalChannel = Union[
-    AnyChannel,
-    None,
-]
+OptionalChannel = Optional[AnyChannel]
 
 
 def limit_str(string: Any, limit: int) -> str:

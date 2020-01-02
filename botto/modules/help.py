@@ -1,8 +1,8 @@
 import inspect
 from typing import Any, Dict, List, Optional
 
-import discord  # type: ignore
-from discord.ext import commands  # type: ignore
+import discord
+from discord.ext import commands
 import yaml
 
 import botto

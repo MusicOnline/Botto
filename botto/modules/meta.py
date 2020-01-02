@@ -1,8 +1,8 @@
 import platform
 import datetime
 
-import discord  # type: ignore
-from discord.ext import commands  # type: ignore
+import discord
+from discord.ext import commands
 
 import botto
 
@@ -44,8 +44,7 @@ class Meta(commands.Cog):
             ram_usage: float = self.bot.process.memory_full_info().uss / 2 ** 20
 
         embed: discord.Embed = discord.Embed(
-            colour=botto.config["MAIN_COLOUR"],
-            timestamp=datetime.datetime.utcnow()
+            colour=botto.config["MAIN_COLOUR"], timestamp=datetime.datetime.utcnow()
         )
         embed.add_field(
             name="Member Stats",

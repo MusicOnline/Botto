@@ -1,9 +1,9 @@
 import functools
 from typing import Any, Callable, Coroutine, Dict, Optional, Tuple, Union
 
-import aiohttp  # type: ignore
+import aiohttp
 
-from discord.ext import commands  # type: ignore
+from discord.ext import commands
 
 import botto
 

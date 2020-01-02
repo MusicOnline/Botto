@@ -3,12 +3,12 @@ import datetime
 import logging
 from typing import Any, Generator, List, Optional
 
-import aiohttp  # type: ignore
-import psutil  # type: ignore
+import aiohttp
+import psutil
 
-import discord  # type: ignore
-from discord.ext import commands  # type: ignore
-from discord.ext import tasks  # type: ignore
+import discord
+from discord.ext import commands
+from discord.ext import tasks
 
 import botto
 from .context import Context

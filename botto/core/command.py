@@ -4,8 +4,8 @@ import inspect
 
 import discord
 import yaml
-from discord.ext import commands  # type: ignore
-from discord.ext.commands.core import hooked_wrapped_callback  # type: ignore
+from discord.ext import commands
+from discord.ext.commands.core import hooked_wrapped_callback
 
 
 class Command(commands.Command):

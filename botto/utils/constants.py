@@ -1,4 +1,4 @@
-from discord import PartialEmoji  # type: ignore
+from discord import PartialEmoji
 
 # Feel free to add/change constants with caution for pre-exsting constants!
 

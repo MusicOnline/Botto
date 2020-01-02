@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from discord.ext import commands  # type: ignore
+from discord.ext import commands
 
 
 class BotMissingFundamentalPermissions(commands.CheckFailure):

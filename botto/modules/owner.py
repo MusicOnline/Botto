@@ -13,11 +13,11 @@ from contextlib import redirect_stdout
 from subprocess import Popen, PIPE
 from typing import Any, Dict, List, Match, Optional, Tuple
 
-import aiohttp  # type: ignore
-import import_expression  # type: ignore
+import aiohttp
+import import_expression
 
-import discord  # type: ignore
-from discord.ext import commands  # type: ignore
+import discord
+from discord.ext import commands
 
 import botto
 
@@ -78,13 +78,11 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
 
         gist_id: str = match.group(1)
         url: str = f"https://api.github.com/gists/{gist_id}"
-        headers: Dict[str, str] = {
-            "Authorization": f"token {github_token}"
-        }
+        headers: Dict[str, str] = {"Authorization": f"token {github_token}"}
 
         try:
             await self.bot.session.delete(url, headers=headers)
-        except aiohttp.ClientResponseError as exc:  # type: ignore
+        except aiohttp.ClientResponseError as exc:
             logger.error(
                 "Failed to delete gist %s in message ID: " "%s, server returned %s %s.",
                 gist_id,
@@ -329,7 +327,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         # Defining the async function.
         try:
             import_expression.exec(to_compile, env)
-        except Exception as exc:  # pylint: disable=broad-except
+        except Exception as exc:
             try:
                 await ctx.message.remove_reaction(botto.aLOADING, ctx.me)
                 await ctx.message.add_reaction(botto.CROSS)
@@ -345,7 +343,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             start: float = time.perf_counter()
             with redirect_stdout(stdout):
                 ret: Any = await func()
-        except Exception as exc:  # pylint: disable=broad-except
+        except Exception as exc:
             try:
                 await ctx.message.remove_reaction(botto.aLOADING, ctx.me)
                 await ctx.message.add_reaction(botto.CROSS)
