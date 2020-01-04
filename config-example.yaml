@@ -9,11 +9,12 @@ DATABASE_URI: null  # Optional[str]
 OWNER_ID: 0  # int
 
 # Discord channel ID of a text channel to send "console" messages to
-# Leave as null to send the messages to the owner's DM 
+# Leave as null to send the messages to the owner's DM
 CONSOLE_CHANNEL_ID: 0  # Optional[int]
 
-# GitHub API token for the owner module
-GITHUB_TOKEN: token  # str
+# GitHub API token with gist scope for the owner module
+# Leave as null to use other methods to send long eval results
+GITHUB_TOKEN: token  # Optional[str]
 
 # Main colour value for embeds and such
 MAIN_COLOUR: 0xFFFFFF  # int
