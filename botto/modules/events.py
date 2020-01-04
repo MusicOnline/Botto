@@ -58,7 +58,7 @@ class Events(commands.Cog):
         line = f"Removed from guild named '{guild}' (ID: {guild.id})."
         logger.info(line)
         embed: discord.Embed = discord.Embed(
-            colour=discord.Colour.yellow(),
+            colour=discord.Colour.gold(),
             timestamp=datetime.datetime.utcnow(),
             description=line,
         )
