@@ -47,7 +47,7 @@ class Botto(commands.AutoShardedBot):
 
         self.add_check(self._check_fundamental_permissions)
         self.after_invoke(self.unlock_after_invoke)
-        self.maintain_presence.start()
+        self.maintain_presence.start()  # pylint: disable=no-member
 
     # ------ Properties ------
 
@@ -102,7 +102,7 @@ class Botto(commands.AutoShardedBot):
     # ------ Basic methods ------
 
     async def close(self) -> None:
-        self.maintain_presence.cancel()
+        self.maintain_presence.cancel()  # pylint: disable=no-member
 
         for ext in tuple(self.extensions):
             self.unload_extension(ext)
