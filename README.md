@@ -36,18 +36,22 @@ You can join the Discord server for support using this template.
 ### Installation
 
 1. Fork this repository.
+
 2. Run this command in your command line:
    ```bash
    git clone https://github.com/{YOUR_USERNAME}/Botto.git
    ```
    If your machine does not have git, you may download it [here](https://git-scm.com/download/win).
+
 3. Start hacking.
 
 
 ### Usage
 
 1. Copy `config-example.yaml` to `config.yaml` in the same directory.
+   
 2. Fill up all necessary configuration values.
+   
 3. Run this command in your command line:
    ```bash
    python -m botto
@@ -57,4 +61,4 @@ You can join the Discord server for support using this template.
 ## Contributing
 
 Contributions are always welcomed.
-Please note that I used the black formatter to format my code, with its default line length limit of 88 columns. You may also open issues on the issue tracker.
+Please note that I use the black formatter to format my code, with its default line length limit of 88 columns. You may also open issues on the issue tracker.
