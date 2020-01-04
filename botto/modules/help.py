@@ -15,6 +15,11 @@ class HelpCommand(commands.HelpCommand):
         self.colour = options.pop("colour", discord.Embed.Empty)
         super().__init__(**options)
 
+    # Bandaid fix since Command.can_run still returns True for disabled commands
+    async def filter_commands(self, commands, *, sort=False, key=None):
+        commands = super().filter_commands(commands, sort=sort, key=key)
+        return [command for command in commands if command.enabled]
+
     async def get_bot_help(self, mapping: BotMapping) -> List[discord.Embed]:
         embeds: List[discord.Embed] = []
         last_embed = None
