@@ -21,7 +21,7 @@ from discord.ext import commands
 
 import botto
 
-logger = logging.getLogger(__name__)
+actions_logger = logging.getLogger("botto.actions")
 
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
@@ -83,8 +83,8 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         try:
             await self.bot.session.delete(url, headers=headers)
         except aiohttp.ClientResponseError as exc:
-            logger.error(
-                "Failed to delete gist %s in message ID: " "%s, server returned %s %s.",
+            actions_logger.error(
+                "Failed to delete gist %s in message ID: %s, server returned %s %s.",
                 gist_id,
                 message.id,
                 exc.code,
@@ -92,7 +92,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             )
             return
 
-        logger.info("Deleted gist %s in message ID: %s.", gist_id, message.id)
+        actions_logger.info("Deleted gist %s in message ID: %s.", gist_id, message.id)
 
         embed: discord.Embed = message.embeds[0]
         embed.description = "The gist containing the results was deleted."

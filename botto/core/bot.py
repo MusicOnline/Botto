@@ -26,7 +26,7 @@ except ImportError:
 else:
     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("botto")
 
 
 class Botto(commands.AutoShardedBot):

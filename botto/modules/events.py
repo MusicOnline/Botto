@@ -11,7 +11,7 @@ from discord.ext import commands
 import botto
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("botto.events")
 
 
 class Events(commands.Cog):
