@@ -23,3 +23,26 @@ MAIN_COLOUR: 0xFFFFFF  # int
 PREFIXES:  # List[str]
     - "botto "
     - "bot!"
+
+# Modules to start up with
+# The bot should at least start up with jishaku to be able to load more modules
+STARTUP_MODULES:  # List[str]
+    - jishaku
+    - botto.modules.events
+    - botto.modules.owner
+    - botto.modules.meta
+    - botto.modules.help
+
+# For the source command
+# Leave as null to disable the command
+SOURCE_CODE_URL: https://github.com/MusicOnline/Botto
+
+# For the support command
+# Leave as null to disable the command
+# The support server "https://discord.gg/wp7Wxzs" is for bot developers using Botto
+# You should set up your own support server if you make any changes to the source code
+SUPPORT_SERVER_INVITE_URL: https://discord.gg/wp7Wxzs
+
+# For the vote command
+# Leave as null to disable the command
+VOTE_URL: null

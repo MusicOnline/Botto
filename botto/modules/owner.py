@@ -69,7 +69,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             return
 
         match: Optional[Match] = re.search(
-            r"\(https://gist\.github\.com/(.+)\)", message.embeds[0].description
+            r"\(https://gist\.github\.com/(.+)\)", message.embeds[0].description or ""
         )
         if match is None:
             return
@@ -390,23 +390,40 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         result.append("```")
 
         result_string: str = "\n".join(result)
-        is_uploaded: bool = False
+        uploaded_to: Optional[str] = None
+        file: Optional[discord.File] = None
 
-        if len(result_string) > 2048:
-            url: str = await ctx.gist(
-                *to_upload,
-                description=(
-                    f"Eval command results from {self._get_origin(ctx)} "
-                    f"at {embed.timestamp}."
-                ),
-            )
-            embed.description = f"Results too long. View them [here]({url})."
-            is_uploaded = True
-        else:
+        if len(result_string) <= 2048:
             embed.description = result_string
+        else:
+            try:
+                url: str = await ctx.gist(
+                    *to_upload,
+                    description=(
+                        f"Eval command results from {self._get_origin(ctx)} "
+                        f"at {embed.timestamp}."
+                    ),
+                )
+            except (aiohttp.ClientResponseError, ValueError):
+                try:
+                    url = await ctx.mystbin(
+                        f"Eval command results from {self._get_origin(ctx)} "
+                        f"at {embed.timestamp}.\n\n{result_string[6:-4]}"
+                    )
+                except aiohttp.ClientResponseError:
+                    # If 8MB is insufficient, give up
+                    file = discord.File(io.StringIO(result_string[6:-4]), "results.txt")
+                    embed.description = "Results too long. View them in the file."
+                else:
+                    uploaded_to = "mystbin"
+            else:
+                uploaded_to = "github"
 
-        message = await ctx.send(embed=embed)
-        if is_uploaded:
+        if uploaded_to:
+            embed.description = f"Results too long. View them [here]({url})."
+
+        message = await ctx.send(embed=embed, file=file)
+        if uploaded_to == "github":
             await message.add_reaction("\N{WASTEBASKET}")
 
 

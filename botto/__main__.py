@@ -1,8 +1,8 @@
 import logging
 import sys
 
-from . import config
-from .core import Botto
+from botto import config
+from botto.core import Botto
 
 # Logging
 dpy_logger: logging.Logger = logging.getLogger("discord")
@@ -14,26 +14,30 @@ formatter: logging.Formatter = logging.Formatter(
     "[{asctime}] [{levelname:>8}] {name}: {message}", style="{"
 )
 
-stream_hdlr: logging.StreamHandler = logging.StreamHandler(sys.stdout)
-file_hdlr: logging.FileHandler = logging.FileHandler(
+stream_handler: logging.StreamHandler = logging.StreamHandler(sys.stdout)
+file_handler: logging.FileHandler = logging.FileHandler(
     filename="botto.log", encoding="utf-8", mode="w"
 )
+error_file_handler: logging.FileHandler = logging.FileHandler(
+    filename="error.log", encoding="utf-8", mode="w"
+)
 
-stream_hdlr.setFormatter(formatter)
-file_hdlr.setFormatter(formatter)
+stream_handler.setFormatter(formatter)
+file_handler.setFormatter(formatter)
+error_file_handler.setFormatter(formatter)
+error_file_handler.setLevel(logging.ERROR)
 
-dpy_logger.addHandler(stream_hdlr)
-dpy_logger.addHandler(file_hdlr)
-logger.addHandler(stream_hdlr)
-logger.addHandler(file_hdlr)
+dpy_logger.addHandler(stream_handler)
+dpy_logger.addHandler(file_handler)
+dpy_logger.addHandler(error_file_handler)
+logger.addHandler(stream_handler)
+logger.addHandler(file_handler)
+logger.addHandler(error_file_handler)
 
 # Bot
 bot: Botto = Botto()
 
-bot.load_extension("jishaku")
-bot.load_extension("botto.modules.events")
-bot.load_extension("botto.modules.owner")
-bot.load_extension("botto.modules.meta")
-bot.load_extension("botto.modules.help")
+for module in config["STARTUP_MODULES"]:
+    bot.load_extension(module)
 
 bot.run(config["TOKEN"])
