@@ -60,5 +60,5 @@ You can join the Discord server for support using this template.
 
 ## Contributing
 
-Contributions are always welcomed.
+Contributions are always welcome.
 Please note that I use the black formatter to format my code, with its default line length limit of 88 columns. You may also open issues on the issue tracker.
