@@ -37,7 +37,4 @@ logger.addHandler(error_file_handler)
 # Bot
 bot: Botto = Botto()
 
-for module in config["STARTUP_MODULES"]:
-    bot.load_extension(module)
-
-bot.run(config["TOKEN"])
+bot.run()

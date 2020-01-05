@@ -134,7 +134,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
     async def shutdown(self, ctx: botto.Context) -> None:
         """Disconnect the bot from Discord and ends its processes."""
         await ctx.send("Shutdown initiated.")
-        await self.bot.close()
+        await self.bot.logout()
 
     @botto.command()
     async def logs(self, ctx: botto.Context) -> None:

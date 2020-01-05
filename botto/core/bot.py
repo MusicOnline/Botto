@@ -1,12 +1,14 @@
 import asyncio
 import datetime
 import logging
+import signal
 from typing import Any, Generator, List, Optional
 
 import aiohttp
 import psutil
 
 import discord
+from discord.client import _cleanup_loop
 from discord.ext import commands
 from discord.ext import tasks
 
@@ -101,16 +103,55 @@ class Botto(commands.AutoShardedBot):
 
     # ------ Basic methods ------
 
-    async def close(self) -> None:
+    def run(self) -> None:
+        # Additional startup behaviour
+        for module in botto.config["STARTUP_MODULES"]:
+            self.load_extension(module)
+
+        # Default behaviour but calls self.shutdown instead of self.close
+        loop = self.loop
+
+        try:
+            loop.add_signal_handler(signal.SIGINT, lambda: loop.stop())
+            loop.add_signal_handler(signal.SIGTERM, lambda: loop.stop())
+        except NotImplementedError:
+            pass
+
+        async def runner() -> None:
+            try:
+                await self.start(botto.config["TOKEN"])
+            finally:
+                await self.shutdown()
+
+        def stop_loop_on_completion(f: asyncio.Future) -> None:
+            loop.stop()
+
+        future = asyncio.ensure_future(runner(), loop=loop)
+        future.add_done_callback(stop_loop_on_completion)
+        try:
+            loop.run_forever()
+        except KeyboardInterrupt:
+            logger.info("Received signal to terminate bot and event loop.")
+        finally:
+            future.remove_done_callback(stop_loop_on_completion)
+            logger.info("Cleaning up tasks.")
+            _cleanup_loop(loop)
+
+        if not future.cancelled():
+            return future.result()
+
+    async def shutdown(self) -> None:
         self.maintain_presence.cancel()  # pylint: disable=no-member
 
         for ext in tuple(self.extensions):
             self.unload_extension(ext)
 
-        await self.session.close()
-        logger.info("Gracefully closed asynchronous HTTP client session.")
-        logger.info("Closing client gracefully...")
-        await super().close()
+        if not self.session.closed:
+            await self.session.close()
+            logger.info("Gracefully closed asynchronous HTTP client session.")
+        if not self.is_closed():
+            logger.info("Closing client gracefully...")
+            await self.close()
 
     async def process_commands(self, message: discord.Message) -> None:
         if message.author.bot:
