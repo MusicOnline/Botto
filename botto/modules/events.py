@@ -158,15 +158,14 @@ class Events(commands.Cog):
         if isinstance(error, ignored):
             return
 
-        full_tb: str = "".join(
-            traceback.format_exception(type(error), error, error.__traceback__)
-        )
+        exc_info = (type(error), error, error.__traceback__)
+        full_tb: str = "".join(traceback.format_exception(*exc_info))
         logger.error(
-            "Unhandled exception in '%s' command. (%s: %s)\n%s",
+            "Unhandled exception in '%s' command. (%s: %s)",
             ctx.command,
-            error.__class__.__name__,
+            type(error).__name__,
             error,
-            full_tb,
+            exc_info=exc_info
         )
 
         embed: discord.Embed = discord.Embed(
@@ -191,9 +190,7 @@ class Events(commands.Cog):
             mystbin_url = await ctx.mystbin(full_tb)
         except aiohttp.ClientResponseError:
             mystbin_url = "Failed to create mystbin."
-        partial_tb: str = "".join(
-            traceback.format_exception(type(error), error, error.__traceback__, limit=5)
-        )
+        partial_tb: str = "".join(traceback.format_exception(*exc_info, limit=5))
         embed = discord.Embed(
             colour=discord.Colour.red(),
             description=(

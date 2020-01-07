@@ -221,6 +221,9 @@ class Botto(commands.AutoShardedBot):
             logger.warning("Meta cog was not found, statistics embed will not be sent.")
         await self.send_console("Bot has connected.", embed=embed)
 
+    async def on_error(self, event_method: str, *args: Any, **kwargs: Any) -> None:
+        logger.exception("Unhandled exception in '%s' event handler.", event_method)
+
     # ------ Other ------
 
     @tasks.loop(minutes=5)
