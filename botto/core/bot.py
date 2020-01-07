@@ -219,6 +219,9 @@ class Botto(commands.AutoShardedBot):
         except KeyError:
             embed = None
             logger.warning("Meta cog was not found, statistics embed will not be sent.")
+        except psutil.AccessDenied:
+            embed = None
+            logger.exception("psutil lacks permissions to check system information.")
         await self.send_console("Bot has connected.", embed=embed)
 
     async def on_error(self, event_method: str, *args: Any, **kwargs: Any) -> None:
