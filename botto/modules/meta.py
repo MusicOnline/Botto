@@ -103,20 +103,20 @@ class Meta(commands.Cog):
         """Show invite link of the bot."""
         await ctx.send(f"<{discord.utils.oauth_url(ctx.me.id)}>")
 
-    @botto.command(enabled=bool(botto.config.get("SOURCE_CODE_URL")))
+    @botto.command(enabled=bool(botto.config["SOURCE_CODE_URL"]))
     async def source(self, ctx: botto.Context) -> None:
         """Show GitHub link to source code."""
         await ctx.send(botto.config["SOURCE_CODE_URL"])
 
     @botto.command(
         aliases=["suggest", "feedback", "report", "contact"],
-        enabled=bool(botto.config.get("SUPPORT_SERVER_INVITE_URL")),
+        enabled=bool(botto.config["SUPPORT_SERVER_INVITE_URL"]),
     )
     async def support(self, ctx: botto.Context) -> None:
         """Show support server link."""
         await ctx.send(botto.config["SUPPORT_SERVER_INVITE_URL"])
 
-    @botto.command(enabled=bool(botto.config.get("VOTE_URL")))
+    @botto.command(enabled=bool(botto.config["VOTE_URL"]))
     async def vote(self, ctx: botto.Context) -> None:
         """Support the bot by voting!"""
         await ctx.send(botto.config["VOTE_URL"])
