@@ -7,7 +7,7 @@ import yaml
 
 import botto
 
-BotMapping = Dict[Optional[commands.Cog], commands.Command]
+BotMapping = Dict[Optional[commands.Cog], List[commands.Command]]
 
 
 class HelpCommand(commands.HelpCommand):
@@ -15,8 +15,8 @@ class HelpCommand(commands.HelpCommand):
         self.colour = options.pop("colour", discord.Embed.Empty)
         super().__init__(**options)
 
-    # Bandaid fix since Command.can_run still returns True for disabled commands
     async def filter_commands(self, commands, *, sort=False, key=None):
+        """Filter out disabled commands even if verify_checks is False."""
         commands = await super().filter_commands(commands, sort=sort, key=key)
         return [command for command in commands if command.enabled]
 
