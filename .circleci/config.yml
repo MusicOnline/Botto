@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  build:
+  linting:
     docker:
       - image: python:3.8.1-buster
 
@@ -17,15 +17,25 @@ jobs:
 
       - run:
           name: Run mypy typing checks
-          command: mypy . --xml-report test-results
+          command: mypy . --xml-report=/reports/mypy
+          when: always
 
       - run:
           name: Run pylint linting checks
-          command: pylint botto
+          command: |
+            mkdir /reports/pylint
+            pylint botto --reports=y > /reports/pylint/report.txt
+          when: always
 
       - store_test_results:
-          path: test-results
+          path: reports
 
       - store_artifacts:
-          path: test-results
-          destination: test-results
+          path: reports
+          destination: reports
+
+workflows:
+  version: 2.1
+  build:
+    jobs:
+      - linting
