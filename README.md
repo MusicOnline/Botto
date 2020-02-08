@@ -48,7 +48,7 @@ You can join the Discord server for support using this template.
 
 ### Usage
 
-1. Copy `config-example.yaml` to `config.yaml` in the same directory.
+1. Copy `config-example.yml` to `config.yml` in the same directory.
    
 2. Fill up all necessary configuration values.
    
