@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   linting:
     docker:
-      - image: python/3.8.1-buster
+      - image: python:3.8.1-buster
 
     working_directory: /usr/local/src/botto_app
 
