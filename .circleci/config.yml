@@ -12,8 +12,13 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            pip install -U lxml mypy pylint
+            pip install -U black lxml mypy pylint
             pip install -r requirements.txt
+
+      - run:
+          name: Run black formatting checks
+          command: black . --check
+          when: always
 
       - run:
           name: Run mypy typing checks
