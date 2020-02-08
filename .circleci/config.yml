@@ -24,14 +24,14 @@ jobs:
           name: Run pylint linting checks
           command: |
             mkdir /reports/pylint
-            pylint botto --reports=y > /reports/pylint/report.txt
+            pylint botto --reports=y 2>&1 | tee /reports/pylint/report.txt
           when: always
 
       - store_test_results:
-          path: reports
+          path: /reports
 
       - store_artifacts:
-          path: reports
+          path: /reports
           destination: reports
 
 workflows:
