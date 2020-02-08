@@ -1,0 +1,35 @@
+version: 2.1
+jobs:
+  linting:
+    docker:
+      - image: python/3.8.1-buster
+
+    working_directory: /usr/local/src/botto_app
+
+    steps:
+      - checkout
+
+      - run:
+          name: install dependencies
+          command: |
+            pip install -U mypy pylint
+            pip install -r requirements.txt
+
+      - run:
+          name: run tests
+          command: |
+            mypy .
+            pylint botto
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: test-results
+          destination: test-results
+
+workflows:
+  version: 2.1
+  build:
+    jobs:
+      - linting
