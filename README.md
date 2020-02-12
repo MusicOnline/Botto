@@ -8,7 +8,7 @@ Botto
 [![Commits][commits-shield]][commits-url]
 [![Discord][discord-shield]][discord-url]
 
-[python-shield]: https://img.shields.io/badge/python-3.8-blue.svg
+[python-shield]: https://img.shields.io/badge/python-3.7-blue.svg
 [discordpy-shield]: https://img.shields.io/badge/discord.py-1.2.5-g
 [discordpy-url]: https://github.com/Rapptz/discord.py/tree/v1.2.5
 [license-shield]: https://img.shields.io/github/license/MusicOnline/Botto
@@ -31,7 +31,7 @@ You can join the Discord server for support using this template.
 
 ### Requirements
 
-- Python 3.8 and above
+- Python 3.7 and above
 
 ### Installation
 

@@ -1,4 +1,4 @@
-FROM python:3.8.1-buster
+FROM python:3.7-buster
 
 WORKDIR /usr/local/src/botto_app
 COPY requirements.txt requirements.txt

@@ -76,7 +76,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
 
         gist_id: str = match.group(1)
 
-        if not (github_token := botto.config["GITHUB_TOKEN"]):
+        if not botto.config["GITHUB_TOKEN"]:
             actions_logger.error(
                 "Failed to delete gist %s in message ID: %s, GITHUB_TOKEN not set in "
                 "config file.",
@@ -85,6 +85,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             )
             return
 
+        github_token = botto.config["GITHUB_TOKEN"]
         url: str = f"https://api.github.com/gists/{gist_id}"
         headers: Dict[str, str] = {"Authorization": f"token {github_token}"}
 

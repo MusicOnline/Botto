@@ -57,8 +57,10 @@ class Context(commands.Context):
         public: bool = False,
     ) -> str:
         """Create a GitHub gist and return the url."""
-        if not (github_token := botto.config["GITHUB_TOKEN"]):
+        if not botto.config["GITHUB_TOKEN"]:
             raise ValueError("GITHUB_TOKEN not set in config file.")
+
+        github_token = botto.config["GITHUB_TOKEN"]
         url: str = "https://api.github.com/gists"
         headers: Dict[str, str]
         headers = {"Authorization": f"token {github_token}"}

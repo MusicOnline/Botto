@@ -80,16 +80,18 @@ class Botto(commands.AutoShardedBot):
         return fmt.format(d=days, h=hours, m=minutes, s=seconds)
 
     def get_owner(self) -> discord.User:
-        if not (owner_id := botto.config["OWNER_ID"]):
+        if not botto.config["OWNER_ID"]:
             raise ValueError("OWNER_ID not set in config file.")
+        owner_id = botto.config["OWNER_ID"]
         owner: Optional[discord.User] = self.get_user(owner_id)
         if owner is None:
             raise ValueError("Could not find owner in user cache.")
         return owner
 
     def get_console_channel(self) -> botto.utils.AnyChannel:
-        if not (channel_id := botto.config["CONSOLE_CHANNEL_ID"]):
+        if not botto.config["CONSOLE_CHANNEL_ID"]:
             raise ValueError("CONSOLE_CHANNEL_ID not set in config file.")
+        channel_id = botto.config["CONSOLE_CHANNEL_ID"]
         channel: botto.utils.OptionalChannel = self.get_channel(channel_id)
         if channel is None:
             raise ValueError("Could not find console channel in channel cache.")
