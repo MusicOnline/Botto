@@ -1,4 +1,6 @@
+asyncpg
 discord.py
+jinja2
 jishaku
 psutil
 pyyaml

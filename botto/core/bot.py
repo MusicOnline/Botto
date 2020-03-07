@@ -5,6 +5,8 @@ import signal
 from typing import Any, Generator, List, Optional
 
 import aiohttp
+import asyncpg
+import jinja2
 import psutil
 
 import discord
@@ -105,14 +107,28 @@ class Botto(commands.AutoShardedBot):
 
     # ------ Basic methods ------
 
+    async def connect_to_database(self, dsn: str) -> None:
+        self.pool: asyncpg.Pool = await asyncpg.create_pool(dsn)
+        if not hasattr(self, "jinja_env"):
+            self.jinja_env = jinja2.Environment(
+                loader=jinja2.FileSystemLoader("botto/sql"), line_statement_prefix="-- :"
+            )
+
+    def get_queries(self, template_name: str) -> Any:
+        return self.jinja_env.get_template(template_name).module
+
     def run(self) -> None:
+        loop = self.loop
+
         # Additional startup behaviour
+        dsn = botto.config["DATABASE_URI"]
+        if dsn:
+            loop.run_until_complete(self.connect_to_database(dsn))
+
         for module in botto.config["STARTUP_MODULES"]:
             self.load_extension(module)
 
         # Default behaviour but calls self.shutdown instead of self.close
-        loop = self.loop
-
         try:
             loop.add_signal_handler(signal.SIGINT, lambda: loop.stop())
             loop.add_signal_handler(signal.SIGTERM, lambda: loop.stop())
@@ -151,6 +167,9 @@ class Botto(commands.AutoShardedBot):
         if not self.session.closed:
             await self.session.close()
             logger.info("Gracefully closed asynchronous HTTP client session.")
+        if hasattr(self, "pool") and not self.pool._closed:
+            await self.pool.close()
+            logger.info("Gracefully closed asynchronous database connection pool.")
         if not self.is_closed():
             logger.info("Closing client gracefully...")
             await self.close()
