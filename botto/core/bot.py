@@ -254,7 +254,7 @@ class Botto(commands.AutoShardedBot):
     async def maintain_presence(self):
         while not self.guilds:
             await asyncio.sleep(1)
-        if self.guilds[0].me.activity is None:
+        if getattr(self.guilds[0].me, "activity", None) is None:
             await self.change_presence(
                 activity=discord.Activity(
                     name=f"@{self.user.name}", type=discord.ActivityType.listening
