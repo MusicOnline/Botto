@@ -15,10 +15,12 @@ class HelpCommand(commands.HelpCommand):
         self.colour = options.pop("colour", discord.Embed.Empty)
         super().__init__(**options)
 
-    async def filter_commands(self, commands, *, sort=False, key=None):
+    async def filter_commands(
+        self, cmds, *, sort=False, key=None
+    ):  # pylint: disable=arguments-differ
         """Filter out disabled commands even if verify_checks is False."""
-        commands = await super().filter_commands(commands, sort=sort, key=key)
-        return [command for command in commands if command.enabled]
+        cmds = await super().filter_commands(cmds, sort=sort, key=key)
+        return [command for command in cmds if command.enabled]
 
     async def get_bot_help(self, mapping: BotMapping) -> List[discord.Embed]:
         embeds: List[discord.Embed] = []
@@ -37,9 +39,7 @@ class HelpCommand(commands.HelpCommand):
                 embed.add_field(name=last_cog, value=last_content, inline=False)
                 last_cog = None
                 last_content = None
-            content = "\n".join(
-                f"`{self.clean_prefix}{cmd}` — {cmd.short_doc}" for cmd in cmds
-            )
+            content = "\n".join(f"`{self.clean_prefix}{cmd}` — {cmd.short_doc}" for cmd in cmds)
             if len(content) > 1024:
                 content = (
                     f"There are {len(cmds)} commands available. Type "
@@ -83,11 +83,11 @@ class HelpCommand(commands.HelpCommand):
         embed.set_thumbnail(url=items.pop("thumbnail", ""))
         embed.set_image(url=items.pop("image", ""))
         items.pop("short", None)
-        for k, v in items.items():
-            inline = k.endswith(" (inline)")
+        for key, value in items.items():
+            inline = key.endswith(" (inline)")
             if inline:
-                k = k[:-9]
-            embed.add_field(name=k, value=v, inline=inline)
+                key = key[:-9]
+            embed.add_field(name=key, value=value, inline=inline)
         return embed
 
     async def get_cog_help(self, cog: commands.Cog) -> List[discord.Embed]:
@@ -139,9 +139,7 @@ class HelpCommand(commands.HelpCommand):
                     last_start_index = i
                     last_content = [content]
                 if i == len(cmds) - 1 and last_start_index == 0:
-                    embed.add_field(
-                        name="Commands", value="\n".join(last_content), inline=False
-                    )
+                    embed.add_field(name="Commands", value="\n".join(last_content), inline=False)
                 elif i == len(cmds) - 1:
                     embed.add_field(
                         name=f"Commands ({last_start_index + 1}-{i + 1}/{len(cmds)})",
@@ -174,14 +172,10 @@ class HelpCommand(commands.HelpCommand):
     async def make_command_embed(self, command: commands.Command) -> discord.Embed:
         docstring = inspect.getdoc(command.callback)
         if not docstring:
-            embed = discord.Embed(
-                colour=self.colour, description="No description available."
-            )
+            embed = discord.Embed(colour=self.colour, description="No description available.")
             embed.set_author(name=f"{self.clean_prefix}{command} {command.signature}")
             if command.aliases:
-                embed.add_field(
-                    name="Aliases", value=" // ".join(command.aliases), inline=False
-                )
+                embed.add_field(name="Aliases", value=" // ".join(command.aliases), inline=False)
             return embed
         items = yaml.full_load(docstring.format(command=command))  # value substitution
         if not isinstance(items, dict):
@@ -189,32 +183,26 @@ class HelpCommand(commands.HelpCommand):
             embed = discord.Embed(colour=self.colour, description=docstring)
             embed.set_author(name=f"{self.clean_prefix}{command} {command.signature}")
             if command.aliases:
-                embed.add_field(
-                    name="Aliases", value=" // ".join(command.aliases), inline=False
-                )
+                embed.add_field(name="Aliases", value=" // ".join(command.aliases), inline=False)
         else:
             embed = discord.Embed(
                 colour=items.pop("colour", self.colour),
                 description=items.pop("description", "No description available."),
             )
             embed.set_author(
-                name=items.pop(
-                    "name", f"{self.clean_prefix}{command} {command.signature}"
-                )
+                name=items.pop("name", f"{self.clean_prefix}{command} {command.signature}")
             )
             embed.set_footer(text=items.pop("footer", discord.Embed.Empty))
             embed.set_thumbnail(url=items.pop("thumbnail", ""))
             embed.set_image(url=items.pop("image", ""))
             items.pop("short", None)
-            for k, v in items.items():
-                inline = k.endswith(" (inline)")
+            for key, value in items.items():
+                inline = key.endswith(" (inline)")
                 if inline:
-                    k = k[:-9]
-                embed.add_field(name=k, value=v, inline=inline)
+                    key = key[:-9]
+                embed.add_field(name=key, value=value, inline=inline)
             if command.aliases and items.pop("add_aliases", True):
-                embed.add_field(
-                    name="Aliases", value=" // ".join(command.aliases), inline=False
-                )
+                embed.add_field(name="Aliases", value=" // ".join(command.aliases), inline=False)
         return embed
 
     async def get_command_help(self, command: commands.Command) -> discord.Embed:
@@ -246,9 +234,7 @@ class HelpCommand(commands.HelpCommand):
                 last_start_index = i
                 last_content = [content]
             if i == len(cmds) - 1 and last_start_index == 0:
-                embed.add_field(
-                    name="Subcommands", value="\n".join(last_content), inline=False
-                )
+                embed.add_field(name="Subcommands", value="\n".join(last_content), inline=False)
             elif i == len(cmds) - 1:
                 embed.add_field(
                     name=f"Subcommands ({last_start_index + 1}-{i + 1}/{len(cmds)})",
@@ -269,10 +255,7 @@ class HelpCommand(commands.HelpCommand):
 
     def subcommand_not_found(self, command: commands.Command, string: str) -> str:
         if isinstance(command, commands.Group) and command.all_commands:
-            return (
-                f"Command `{command.qualified_name}` has no subcommand named "
-                f"`{string}`."
-            )
+            return f"Command `{command.qualified_name}` has no subcommand named `{string}`."
         return f"Command `{command.qualified_name}` has no subcommands."
 
     async def send_error_message(self, error: str) -> discord.Message:

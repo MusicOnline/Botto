@@ -11,7 +11,7 @@ from discord.ext import commands
 import botto
 
 
-logger = logging.getLogger("botto.events")
+logger = logging.getLogger("botto.events")  # pylint: disable=invalid-name
 
 
 class Events(commands.Cog):
@@ -48,9 +48,7 @@ class Events(commands.Cog):
         line = f"Joined guild named '{guild}' (ID: {guild.id})."
         logger.info(line)
         embed: discord.Embed = discord.Embed(
-            colour=discord.Colour.green(),
-            timestamp=datetime.datetime.utcnow(),
-            description=line,
+            colour=discord.Colour.green(), timestamp=datetime.datetime.utcnow(), description=line,
         )
         await self.bot.send_console(embed=embed)
 
@@ -59,9 +57,7 @@ class Events(commands.Cog):
         line = f"Removed from guild named '{guild}' (ID: {guild.id})."
         logger.info(line)
         embed: discord.Embed = discord.Embed(
-            colour=discord.Colour.gold(),
-            timestamp=datetime.datetime.utcnow(),
-            description=line,
+            colour=discord.Colour.gold(), timestamp=datetime.datetime.utcnow(), description=line,
         )
         await self.bot.send_console(embed=embed)
 
@@ -69,7 +65,7 @@ class Events(commands.Cog):
     async def on_command(self, ctx: botto.Context) -> None:
         logger.info("Command '%s' was called by %s.", ctx.command, ctx.author)
 
-    @commands.Cog.listener()
+    @commands.Cog.listener()  # noqa: C901
     async def on_command_error(self, ctx: botto.Context, error: Exception) -> None:
         # error is not typehinted as commands.CommandError
         # because error.original is not one
@@ -97,9 +93,7 @@ class Events(commands.Cog):
             return
 
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(
-                f"You are on cooldown. Retry in {error.retry_after:.1} second(s)."
-            )
+            await ctx.send(f"You are on cooldown. Retry in {error.retry_after:.1} second(s).")
             return
 
         if isinstance(error, botto.SubcommandRequired):
@@ -132,8 +126,7 @@ class Events(commands.Cog):
                         f"without decimals."
                     )
             await ctx.send(
-                f"You passed a bad argument. Here's how bad it is.\n"
-                f"```\n{error_msg}\n```"
+                f"You passed a bad argument. Here's how bad it is.\n```\n{error_msg}\n```"
             )
             return
 
@@ -166,7 +159,7 @@ class Events(commands.Cog):
             ctx.command,
             type(error).__name__,
             error,
-            exc_info=exc_info
+            exc_info=exc_info,
         )
 
         embed: discord.Embed = discord.Embed(
@@ -203,9 +196,7 @@ class Events(commands.Cog):
         embed.set_author(name=f"Unexpected Exception - {type(error).__name__}")
         embed.set_footer(text=f"From command '{ctx.command}'")
         embed.add_field(
-            name="Command Caller",
-            value=f"{ctx.author} `({ctx.author.id})`",
-            inline=False,
+            name="Command Caller", value=f"{ctx.author} `({ctx.author.id})`", inline=False,
         )
         if ctx.guild:
             embed.add_field(
@@ -218,9 +209,7 @@ class Events(commands.Cog):
             )
         else:
             embed.add_field(
-                name="Call Origin",
-                value=f"From DM channel `({ctx.channel.id})`",
-                inline=False,
+                name="Call Origin", value=f"From DM channel `({ctx.channel.id})`", inline=False,
             )
         embed.add_field(
             name="Call Message",

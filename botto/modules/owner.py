@@ -21,7 +21,7 @@ from discord.ext import commands
 
 import botto
 
-actions_logger = logging.getLogger("botto.actions")
+actions_logger = logging.getLogger("botto.actions")  # pylint: disable=invalid-name
 
 
 class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
@@ -31,7 +31,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         self.bot: botto.Botto = bot
         self._last_result: Optional[Any] = None
 
-    async def cog_check(self, ctx: botto.Context) -> bool:
+    async def cog_check(  # pylint: disable=invalid-overridden-method
+        self, ctx: botto.Context
+    ) -> bool:
         return await self.bot.is_owner(ctx.author)
 
     @staticmethod
@@ -51,14 +53,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         return origin
 
     @commands.Cog.listener()
-    async def on_raw_reaction_add(
-        self, payload: discord.RawReactionActionEvent
-    ) -> None:
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent) -> None:
         """Delete gist in message by reacting with :wastebucket:."""
-        if (
-            str(payload.emoji) != "\N{WASTEBASKET}"
-            or payload.user_id != self.bot.owner_id
-        ):
+        if str(payload.emoji) != "\N{WASTEBASKET}" or payload.user_id != self.bot.owner_id:
             return
 
         channel: botto.utils.OptionalChannel = self.bot.get_channel(payload.channel_id)
@@ -109,9 +106,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         try:
             await message.edit(embed=embed)
             await message.remove_reaction("\N{WASTEBASKET}", self.bot.user)
-            await message.remove_reaction(
-                "\N{WASTEBASKET}", discord.Object(payload.user_id)
-            )
+            await message.remove_reaction("\N{WASTEBASKET}", discord.Object(payload.user_id))
         except (discord.Forbidden, discord.NotFound):
             pass
 
@@ -147,9 +142,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             await ctx.message.add_reaction("\N{OPEN MAILBOX WITH RAISED FLAG}")
 
     @botto.command(aliases=["runas"])
-    async def pseudo(
-        self, ctx: botto.Context, user: discord.Member, *, message: str
-    ) -> None:
+    async def pseudo(self, ctx: botto.Context, user: discord.Member, *, message: str) -> None:
         """Run a command as another user."""
         msg: discord.Message = copy.copy(ctx.message)
         msg.content = message
@@ -216,7 +209,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             return
 
         await self.bot.user.edit(avatar=avatar)
-        await ctx.send(f"Client's avatar has been updated.")
+        await ctx.send("Client's avatar has been updated.")
 
     # ------ Testing errors ------
 
@@ -294,18 +287,13 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         if len(result_string) > 2048:
             url: str = await ctx.gist(
                 *to_upload,
-                description=(
-                    f"Shell command results from {self._get_origin(ctx)} "
-                    f"at {timestamp}."
-                ),
+                description=(f"Shell command results from {self._get_origin(ctx)} at {timestamp}."),
             )
             result_string = f"Results too long. View them [here]({url})."
             is_uploaded = True
 
         embed: discord.Embed = discord.Embed(
-            description=result_string,
-            timestamp=timestamp,
-            colour=botto.config["MAIN_COLOUR"],
+            description=result_string, timestamp=timestamp, colour=botto.config["MAIN_COLOUR"],
         )
         embed.set_author(name="Shell Command Results")
         embed.set_footer(text=f"Took {delta:.2f} ms")
@@ -314,7 +302,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         if is_uploaded:
             await message.add_reaction("\N{WASTEBASKET}")
 
-    @botto.command(name="eval")
+    @botto.command(name="eval")  # noqa: C901
     async def eval_command(self, ctx: botto.Context, *, code: str) -> None:
         """Evaluate a block of code."""
         await ctx.message.add_reaction(botto.aLOADING)
@@ -336,7 +324,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         # Defining the async function.
         try:
             import_expression.exec(to_compile, env)
-        except Exception as exc:
+        except Exception as exc:  # pylint: disable=broad-except
             try:
                 await ctx.message.remove_reaction(botto.aLOADING, ctx.me)
                 await ctx.message.add_reaction(botto.CROSS)
@@ -352,7 +340,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             start: float = time.perf_counter()
             with redirect_stdout(stdout):
                 ret: Any = await func()
-        except Exception as exc:
+        except Exception as exc:  # pylint: disable=broad-except
             try:
                 await ctx.message.remove_reaction(botto.aLOADING, ctx.me)
                 await ctx.message.add_reaction(botto.CROSS)
@@ -371,9 +359,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             await ctx.message.add_reaction(botto.CHECK)
         except discord.NotFound:
             if not value and ret is None:
-                await ctx.send(
-                    f"{ctx.author.mention} Code execution completed in {delta:.2f} ms."
-                )
+                await ctx.send(f"{ctx.author.mention} Code execution completed in {delta:.2f} ms.")
 
         if not value and ret is None:
             return
@@ -383,9 +369,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             timestamp=ctx.message.created_at, colour=botto.config["MAIN_COLOUR"]
         )
         embed.set_author(name="Code Evaluation")
-        embed.set_footer(
-            text=f"Took {delta:.2f} ms with Python {platform.python_version()}"
-        )
+        embed.set_footer(text=f"Took {delta:.2f} ms with Python {platform.python_version()}")
 
         result: List[str] = ["```py"]
         to_upload: List[Tuple[str, str]] = [("code.py", code)]

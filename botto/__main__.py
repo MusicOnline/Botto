@@ -1,8 +1,7 @@
 import logging
 import sys
 
-from botto import config
-from botto.core import Botto
+from botto import Botto
 
 # Logging
 dpy_logger: logging.Logger = logging.getLogger("discord")

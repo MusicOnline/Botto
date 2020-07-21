@@ -8,5 +8,3 @@ venv/
 .vscode/
 *.sublime-project
 *.sublime-workspace
-mypy.ini
-.pylintrc

@@ -1,11 +1,9 @@
 import asyncio
 import functools
-import inspect
 
 import discord
 import yaml
 from discord.ext import commands
-from discord.ext.commands.core import hooked_wrapped_callback
 
 
 class Command(commands.Command):
@@ -57,5 +55,5 @@ class Group(GroupMixin, Command, commands.Group):
     pass
 
 
-command = functools.partial(commands.command, cls=Command)
-group = functools.partial(commands.command, cls=Group)
+command = functools.partial(commands.command, cls=Command)  # pylint: disable=invalid-name
+group = functools.partial(commands.command, cls=Group)  # pylint: disable=invalid-name

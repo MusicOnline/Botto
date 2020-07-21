@@ -10,7 +10,7 @@ import asyncio
 
 import discord
 
-import botto
+from botto import config  # pylint: disable=cyclic-import
 
 FIRST_PAGE = "\N{BLACK LEFT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR}"
 PREVIOUS_PAGE = "\N{BLACK LEFT-POINTING TRIANGLE}"
@@ -82,7 +82,7 @@ class EmbedPaginator:
         pages += bool(left_over)
         self.current_page = 0
         self.maximum_pages = pages
-        self.embed = discord.Embed(colour=botto.config["MAIN_COLOUR"])
+        self.embed = discord.Embed(colour=config["MAIN_COLOUR"])
         self.paginating = len(entries) > per_page
         self.match = None
         self.reaction_emojis = [
@@ -192,32 +192,26 @@ class EmbedPaginator:
                 await self.show_page(page)
             else:
                 to_delete.append(
-                    await self.ctx.send(
-                        f"Invalid page given. ({page}/{self.maximum_pages})"
-                    )
+                    await self.ctx.send(f"Invalid page given. ({page}/{self.maximum_pages})")
                 )
                 await asyncio.sleep(5)
 
         try:
             await self.channel.delete_messages(to_delete)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             pass
 
     async def show_help(self):
         """Show the interactive paginator instructions."""
         messages = ["This is an interactive paginator.\n"]
-        messages.append(
-            "You can use the following reactions to navigate through its entries:\n"
-        )
+        messages.append("You can use the following reactions to navigate through its entries:\n")
 
         for (emoji, func) in self.reaction_emojis:
             messages.append(f"{emoji} {func.__doc__}")
 
         self.embed.description = "\n".join(messages)
         self.embed.clear_fields()
-        self.embed.set_footer(
-            text=f"You were on page {self.current_page} before this message."
-        )
+        self.embed.set_footer(text=f"You were on page {self.current_page} before this message.")
         await self.message.edit(embed=self.embed)
 
         async def go_back_to_current_page():
@@ -234,7 +228,7 @@ class EmbedPaginator:
     async def remove_reactions(self, *, individually=True):
         try:
             await self.message.clear_reactions()
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             if not individually:
                 return
 
@@ -244,7 +238,7 @@ class EmbedPaginator:
                     continue
                 try:
                     await self.message.remove_reaction(reaction, self.ctx.me)
-                except Exception:
+                except Exception:  # pylint: disable=broad-except
                     pass
 
     def react_check(self, reaction, user):
@@ -272,12 +266,8 @@ class EmbedPaginator:
         while self.paginating:
             done, pending = await asyncio.wait(
                 [
-                    self.bot.wait_for(
-                        "reaction_add", check=self.react_check, timeout=120
-                    ),
-                    self.bot.wait_for(
-                        "reaction_remove", check=self.react_check, timeout=120
-                    ),
+                    self.bot.wait_for("reaction_add", check=self.react_check, timeout=120),
+                    self.bot.wait_for("reaction_remove", check=self.react_check, timeout=120),
                 ],
                 return_when=asyncio.FIRST_COMPLETED,
             )

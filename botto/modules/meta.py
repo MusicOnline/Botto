@@ -17,17 +17,11 @@ class Meta(commands.Cog):
         total_members: int = sum(1 for m in self.bot.get_all_members())
         total_users: int = self.bot.user_count
         total_online: int = len(
-            {
-                m
-                for m in self.bot.get_all_members()
-                if m.status is not discord.Status.offline
-            }
+            {m for m in self.bot.get_all_members() if m.status is not discord.Status.offline}
         )
 
         text_channels: int = sum(
-            1
-            for channel in self.bot.get_all_channels()
-            if isinstance(channel, discord.TextChannel)
+            1 for channel in self.bot.get_all_channels() if isinstance(channel, discord.TextChannel)
         )
         voice_channels: int = sum(
             1
@@ -64,16 +58,11 @@ class Meta(commands.Cog):
         )
         embed.add_field(
             name="Versions",
-            value=(
-                f"Python {platform.python_version()}\n"
-                f"discord.py {discord.__version__}"
-            ),
+            value=(f"Python {platform.python_version()}\ndiscord.py {discord.__version__}"),
         )
         embed.add_field(
             name="Uptime",
-            value=(
-                f"{self.bot.humanize_uptime(brief=True)}\n" f"(Since {up_since} UTC)"
-            ),
+            value=(f"{self.bot.humanize_uptime(brief=True)}\n(Since {up_since} UTC)"),
         )
         embed.add_field(name="Connection", value=f"{ping} ms current")
         embed.add_field(name="Process", value=f"{cpu_usage}% CPU\n{ram_usage:.2f} MiB")

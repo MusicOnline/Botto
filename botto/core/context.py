@@ -5,7 +5,7 @@ import aiohttp
 
 from discord.ext import commands
 
-import botto
+from botto import config  # pylint: disable=cyclic-import
 
 try:
     import ujson as json
@@ -51,16 +51,13 @@ class Context(commands.Context):
             return f"https://mystb.in/{response['key']}"
 
     async def gist(
-        self,
-        *files: Tuple[str, str],
-        description: Optional[str] = None,
-        public: bool = False,
+        self, *files: Tuple[str, str], description: Optional[str] = None, public: bool = False,
     ) -> str:
         """Create a GitHub gist and return the url."""
-        if not botto.config["GITHUB_TOKEN"]:
+        if not config["GITHUB_TOKEN"]:
             raise ValueError("GITHUB_TOKEN not set in config file.")
 
-        github_token = botto.config["GITHUB_TOKEN"]
+        github_token = config["GITHUB_TOKEN"]
         url: str = "https://api.github.com/gists"
         headers: Dict[str, str]
         headers = {"Authorization": f"token {github_token}"}
@@ -82,9 +79,7 @@ class Context(commands.Context):
         async with self.session.get(str(url), **kwargs) as resp:
             return await resp.read()
 
-    async def get_as_text(
-        self, url: Any, encoding: Optional[str] = None, **kwargs: Any
-    ) -> str:
+    async def get_as_text(self, url: Any, encoding: Optional[str] = None, **kwargs: Any) -> str:
         """Send a GET request and return the response as text."""
         async with self.session.get(str(url), **kwargs) as resp:
             return await resp.text(encoding=encoding)
@@ -100,9 +95,7 @@ class Context(commands.Context):
     ) -> Any:
         """Send a GET request and return the response as json."""
         async with self.session.get(str(url), **kwargs) as resp:
-            return await resp.json(
-                encoding=encoding, loads=loads, content_type=content_type
-            )
+            return await resp.json(encoding=encoding, loads=loads, content_type=content_type)
 
 
 CoroType = Callable[..., Coroutine[Any, Any, Any]]

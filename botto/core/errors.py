@@ -9,8 +9,7 @@ class BotMissingFundamentalPermissions(commands.CheckFailure):
         self.send_messages: bool = "send_messages" not in missing_perms
 
         missing: List[str] = [
-            perm.replace("_", " ").replace("guild", "server").title()
-            for perm in missing_perms
+            perm.replace("_", " ").replace("guild", "server").title() for perm in missing_perms
         ]
 
         if len(missing) > 2:

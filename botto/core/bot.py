@@ -14,7 +14,7 @@ from discord.client import _cleanup_loop
 from discord.ext import commands
 from discord.ext import tasks
 
-import botto
+from botto import config, utils  # pylint: disable=cyclic-import
 from .context import Context
 from .errors import BotMissingFundamentalPermissions
 
@@ -30,15 +30,15 @@ except ImportError:
 else:
     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
-logger = logging.getLogger("botto")
+logger = logging.getLogger("botto")  # pylint: disable=invalid-name
 
 
 class Botto(commands.AutoShardedBot):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(
-            command_prefix=commands.when_mentioned_or(*botto.config["PREFIXES"]),
+            command_prefix=commands.when_mentioned_or(*config["PREFIXES"]),
             pm_help=False,
-            owner_id=botto.config["OWNER_ID"],
+            owner_id=config["OWNER_ID"],
             **kwargs,
         )
         self.ready_time: Optional[datetime.datetime] = None
@@ -82,19 +82,19 @@ class Botto(commands.AutoShardedBot):
         return fmt.format(d=days, h=hours, m=minutes, s=seconds)
 
     def get_owner(self) -> discord.User:
-        if not botto.config["OWNER_ID"]:
+        if not config["OWNER_ID"]:
             raise ValueError("OWNER_ID not set in config file.")
-        owner_id = botto.config["OWNER_ID"]
+        owner_id = config["OWNER_ID"]
         owner: Optional[discord.User] = self.get_user(owner_id)
         if owner is None:
             raise ValueError("Could not find owner in user cache.")
         return owner
 
-    def get_console_channel(self) -> botto.utils.AnyChannel:
-        if not botto.config["CONSOLE_CHANNEL_ID"]:
+    def get_console_channel(self) -> utils.AnyChannel:
+        if not config["CONSOLE_CHANNEL_ID"]:
             raise ValueError("CONSOLE_CHANNEL_ID not set in config file.")
-        channel_id = botto.config["CONSOLE_CHANNEL_ID"]
-        channel: botto.utils.OptionalChannel = self.get_channel(channel_id)
+        channel_id = config["CONSOLE_CHANNEL_ID"]
+        channel: utils.OptionalChannel = self.get_channel(channel_id)
         if channel is None:
             raise ValueError("Could not find console channel in channel cache.")
         return channel
@@ -108,41 +108,40 @@ class Botto(commands.AutoShardedBot):
     # ------ Basic methods ------
 
     async def connect_to_database(self, dsn: str) -> None:
-        self.pool: asyncpg.Pool = await asyncpg.create_pool(dsn)
+        self.pool: asyncpg.Pool = await asyncpg.create_pool(dsn)  # pylint: disable=no-member
         if not hasattr(self, "jinja_env"):
             self.jinja_env = jinja2.Environment(
-                loader=jinja2.FileSystemLoader("botto/sql"), line_statement_prefix="-- :"
+                loader=jinja2.FileSystemLoader("botto/sql"), line_statement_prefix="-- :",
             )
 
     def get_queries(self, template_name: str) -> Any:
         return self.jinja_env.get_template(template_name).module
 
-    def run(self) -> None:
+    def run(self) -> None:  # noqa: C901  # pylint: disable=arguments-differ
         loop = self.loop
 
         # Additional startup behaviour
-        dsn = botto.config["DATABASE_URI"]
+        dsn = config["DATABASE_URI"]
         if dsn:
             loop.run_until_complete(self.connect_to_database(dsn))
 
-        for module in botto.config["STARTUP_MODULES"]:
+        for module in config["STARTUP_MODULES"]:
             self.load_extension(module)
 
         # Default behaviour but calls self.shutdown instead of self.close
         try:
-            loop.add_signal_handler(signal.SIGINT, lambda: loop.stop())
-            loop.add_signal_handler(signal.SIGTERM, lambda: loop.stop())
+            loop.add_signal_handler(signal.SIGINT, loop.stop)
+            loop.add_signal_handler(signal.SIGTERM, loop.stop)
         except NotImplementedError:
             pass
 
         async def runner() -> None:
             try:
-                await self.start(botto.config["TOKEN"])
+                await self.start(config["TOKEN"])
             finally:
                 await self.shutdown()
 
-        def stop_loop_on_completion(f: asyncio.Future) -> None:
-            loop.stop()
+        stop_loop_on_completion = lambda future: loop.stop()  # noqa: E731
 
         future = asyncio.ensure_future(runner(), loop=loop)
         future.add_done_callback(stop_loop_on_completion)
@@ -156,7 +155,7 @@ class Botto(commands.AutoShardedBot):
             _cleanup_loop(loop)
 
         if not future.cancelled():
-            return future.result()
+            future.result()
 
     async def shutdown(self) -> None:
         self.maintain_presence.cancel()  # pylint: disable=no-member
