@@ -1,6 +1,26 @@
 # Discord API token of the bot to login
 TOKEN: token  # str
 
+# Gateway intents control events the bot receives
+# Privileged gateway intents for bots in above 100 guilds require verification
+# No intents are necessary to function but *_MESSAGES intents should be enabled to receive messages
+INTENTS:  # Dict[str, bool]
+    GUILDS: false
+    MEMBERS: false  # Privileged
+    BANS: false
+    EMOJIS: false
+    INTEGRATIONS: false
+    WEBHOOKS: false
+    INVITES: false
+    VOICE_STATES: false
+    PRESENCES: false  # Privileged
+    GUILD_MESSAGES: true
+    GUILD_MESSAGE_REACTIONS: true
+    GUILD_MESSAGE_TYPING: false
+    DIRECT_MESSAGES: true
+    DIRECT_MESSAGE_REACTIONS: true
+    DIRECT_MESSAGE_TYPING: false
+
 # Database URI in the format of postgres://user:password@host:port/database
 # Leave as null if database connection not needed
 DATABASE_URI: null  # Optional[str]

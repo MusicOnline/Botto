@@ -301,7 +301,10 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         embed.set_footer(text=f"Took {delta:.2f} ms")
 
         message = await ctx.send(embed=embed)
-        if is_uploaded:
+        if is_uploaded and (
+            (ctx.guild and botto.config["INTENTS"]["GUILD_MESSAGE_REACTIONS"])
+            or (not ctx.guild and botto.config["INTENTS"]["DIRECT_MESSAGE_REACTIONS"])
+        ):
             await message.add_reaction("\N{WASTEBASKET}")
 
     @botto.command(name="eval")  # noqa: C901
@@ -418,7 +421,10 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             embed.description = f"Results too long. View them [here]({url})."
 
         message = await ctx.send(embed=embed, file=file)
-        if uploaded_to == "github":
+        if uploaded_to == "github" and (
+            (ctx.guild and botto.config["INTENTS"]["GUILD_MESSAGE_REACTIONS"])
+            or (not ctx.guild and botto.config["INTENTS"]["DIRECT_MESSAGE_REACTIONS"])
+        ):
             await message.add_reaction("\N{WASTEBASKET}")
 
 
