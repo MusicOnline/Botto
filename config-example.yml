@@ -16,8 +16,8 @@ CONSOLE_CHANNEL_ID: 0  # Optional[int]
 # Leave as null to use other methods to send long eval results
 GITHUB_TOKEN: token  # Optional[str]
 
-# Main colour value for embeds and such
-MAIN_COLOUR: 0xFFFFFF  # int
+# Main color value for embeds and such
+MAIN_COLOR: 0xFFFFFF  # int
 
 # Command prefixes in addition to mentions
 # Leave as [] to only use mentions

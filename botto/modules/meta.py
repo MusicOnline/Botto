@@ -38,13 +38,13 @@ class Meta(commands.Cog):
             ram_usage: float = self.bot.process.memory_full_info().uss / 2 ** 20
 
         embed: discord.Embed = discord.Embed(
-            colour=botto.config["MAIN_COLOUR"], timestamp=datetime.datetime.utcnow()
+            color=botto.config["MAIN_COLOR"], timestamp=datetime.datetime.utcnow()
         )
         embed.add_field(
             name="Member Stats",
             value=(
                 f"{total_members} total members\n"
-                f"{total_users} unqiue users\n"
+                f"{total_users} unique users\n"
                 f"{total_online} users online"
             ),
         )

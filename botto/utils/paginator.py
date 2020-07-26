@@ -45,7 +45,7 @@ class EmbedPaginator:
     jump_option: bool
         Whether the jump option should be available.
     help_option: bool
-        Whther the usage help option should be available.
+        Whether the usage help option should be available.
 
     Attributes
     -----------
@@ -82,7 +82,7 @@ class EmbedPaginator:
         pages += bool(left_over)
         self.current_page = 0
         self.maximum_pages = pages
-        self.embed = discord.Embed(colour=config["MAIN_COLOUR"])
+        self.embed = discord.Embed(color=config["MAIN_COLOR"])
         self.paginating = len(entries) > per_page
         self.match = None
         self.reaction_emojis = [

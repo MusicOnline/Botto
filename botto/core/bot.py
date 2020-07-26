@@ -120,7 +120,7 @@ class Botto(commands.AutoShardedBot):
     def run(self) -> None:  # noqa: C901  # pylint: disable=arguments-differ
         loop = self.loop
 
-        # Additional startup behaviour
+        # Additional startup behavior
         dsn = config["DATABASE_URI"]
         if dsn:
             loop.run_until_complete(self.connect_to_database(dsn))
@@ -128,7 +128,7 @@ class Botto(commands.AutoShardedBot):
         for module in config["STARTUP_MODULES"]:
             self.load_extension(module)
 
-        # Default behaviour but calls self.shutdown instead of self.close
+        # Default behavior but calls self.shutdown instead of self.close
         try:
             loop.add_signal_handler(signal.SIGINT, loop.stop)
             loop.add_signal_handler(signal.SIGTERM, loop.stop)

@@ -1,6 +1,6 @@
 from discord import PartialEmoji
 
-# Feel free to add/change constants with caution for pre-exsting constants!
+# Feel free to add/change constants with caution for pre-existing constants!
 # pylint: disable=invalid-name
 
 TRANSPARENT_DARK = 0x36393E

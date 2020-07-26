@@ -17,7 +17,7 @@ class BotMissingFundamentalPermissions(commands.CheckFailure):
         else:
             fmt = " and ".join(missing)
 
-        message: str = f"Botto requires {fmt} permission(s) to function."
+        message: str = f"The bot requires {fmt} permission(s) to function."
 
         super().__init__(message, *args)
 
