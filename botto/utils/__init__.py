@@ -53,6 +53,6 @@ def is_conversion_err(error: Exception) -> Optional[Tuple[str, int]]:
     return None
 
 
-def get_random_colour() -> discord.Colour:
-    """Get a colour with random hue, full saturation and value."""
-    return discord.Colour.from_hsv(random.random(), 1, 1)
+def get_random_color() -> discord.Color:
+    """Get a color with random hue, full saturation and value."""
+    return discord.Color.from_hsv(random.random(), 1, 1)

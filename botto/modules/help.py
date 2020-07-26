@@ -12,7 +12,7 @@ BotMapping = Dict[Optional[commands.Cog], List[commands.Command]]
 
 class HelpCommand(commands.HelpCommand):
     def __init__(self, **options: Any) -> None:
-        self.colour = options.pop("colour", discord.Embed.Empty)
+        self.color = options.pop("color", discord.Embed.Empty)
         super().__init__(**options)
 
     async def filter_commands(
@@ -32,7 +32,7 @@ class HelpCommand(commands.HelpCommand):
             if not cog or not cmds:
                 continue
             if last_embed is None:
-                embed = discord.Embed(colour=self.colour)
+                embed = discord.Embed(color=self.color)
             else:
                 embed = last_embed
             if last_content:
@@ -75,7 +75,7 @@ class HelpCommand(commands.HelpCommand):
             # For docstrings without format (eg. third party commands like jishaku)
             return None
         embed = discord.Embed(
-            colour=items.pop("colour", self.colour),
+            color=items.pop("color", self.color),
             description=items.pop("description", "No description available."),
         )
         embed.set_author(name=items.pop("name", cog.qualified_name))
@@ -119,7 +119,7 @@ class HelpCommand(commands.HelpCommand):
             before = embed.copy()
         else:
             embed = discord.Embed(
-                colour=self.colour, description=cog.description or discord.Embed.Empty
+                color=self.color, description=cog.description or discord.Embed.Empty
             )
             embed.set_author(name=cog.qualified_name)
 
@@ -151,7 +151,7 @@ class HelpCommand(commands.HelpCommand):
         if len(embed) > 6000 and embeds:
             embeds[0] = before
             embed = discord.Embed(
-                colour=before.colour, description=cog.description or discord.Embed.Empty
+                color=before.color, description=cog.description or discord.Embed.Empty
             )
             embed.set_author(name=cog.qualified_name)
             add_command_fields(embed)
@@ -172,7 +172,7 @@ class HelpCommand(commands.HelpCommand):
     async def make_command_embed(self, command: commands.Command) -> discord.Embed:
         docstring = inspect.getdoc(command.callback)
         if not docstring:
-            embed = discord.Embed(colour=self.colour, description="No description available.")
+            embed = discord.Embed(color=self.color, description="No description available.")
             embed.set_author(name=f"{self.clean_prefix}{command} {command.signature}")
             if command.aliases:
                 embed.add_field(name="Aliases", value=" // ".join(command.aliases), inline=False)
@@ -180,13 +180,13 @@ class HelpCommand(commands.HelpCommand):
         items = yaml.full_load(docstring.format(command=command))  # value substitution
         if not isinstance(items, dict):
             # For docstrings without format (eg. third party commands like jishaku)
-            embed = discord.Embed(colour=self.colour, description=docstring)
+            embed = discord.Embed(color=self.color, description=docstring)
             embed.set_author(name=f"{self.clean_prefix}{command} {command.signature}")
             if command.aliases:
                 embed.add_field(name="Aliases", value=" // ".join(command.aliases), inline=False)
         else:
             embed = discord.Embed(
-                colour=items.pop("colour", self.colour),
+                color=items.pop("color", self.color),
                 description=items.pop("description", "No description available."),
             )
             embed.set_author(
@@ -265,7 +265,7 @@ class HelpCommand(commands.HelpCommand):
 def setup(bot: botto.Botto) -> None:
     bot._old_help_command = bot.help_command
     bot.help_command = HelpCommand(
-        colour=botto.config["MAIN_COLOUR"],
+        color=botto.config["MAIN_COLOR"],
         verify_checks=False,
         command_attrs={"help": "Show help information."},
     )

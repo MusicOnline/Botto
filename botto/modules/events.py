@@ -48,7 +48,7 @@ class Events(commands.Cog):
         line = f"Joined guild named '{guild}' (ID: {guild.id})."
         logger.info(line)
         embed: discord.Embed = discord.Embed(
-            colour=discord.Colour.green(), timestamp=datetime.datetime.utcnow(), description=line,
+            color=discord.Color.green(), timestamp=datetime.datetime.utcnow(), description=line,
         )
         await self.bot.send_console(embed=embed)
 
@@ -57,7 +57,7 @@ class Events(commands.Cog):
         line = f"Removed from guild named '{guild}' (ID: {guild.id})."
         logger.info(line)
         embed: discord.Embed = discord.Embed(
-            colour=discord.Colour.gold(), timestamp=datetime.datetime.utcnow(), description=line,
+            color=discord.Color.gold(), timestamp=datetime.datetime.utcnow(), description=line,
         )
         await self.bot.send_console(embed=embed)
 
@@ -163,7 +163,7 @@ class Events(commands.Cog):
         )
 
         embed: discord.Embed = discord.Embed(
-            colour=discord.Colour.red(),
+            color=discord.Color.red(),
             description=(
                 f"The developer has been notified regarding this error.\n"
                 f"Here's an apology cookie. \N{COOKIE}\n"
@@ -186,7 +186,7 @@ class Events(commands.Cog):
             mystbin_url = "Failed to create mystbin."
         partial_tb: str = "".join(traceback.format_exception(*exc_info, limit=5))
         embed = discord.Embed(
-            colour=discord.Colour.red(),
+            color=discord.Color.red(),
             description=(
                 f"```py\n{botto.utils.limit_str(partial_tb, 1900)}\n```\n"
                 f"Full traceback: {mystbin_url}"

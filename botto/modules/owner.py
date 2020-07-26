@@ -293,7 +293,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             is_uploaded = True
 
         embed: discord.Embed = discord.Embed(
-            description=result_string, timestamp=timestamp, colour=botto.config["MAIN_COLOUR"],
+            description=result_string, timestamp=timestamp, color=botto.config["MAIN_COLOR"],
         )
         embed.set_author(name="Shell Command Results")
         embed.set_footer(text=f"Took {delta:.2f} ms")
@@ -330,7 +330,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
                 await ctx.message.add_reaction(botto.CROSS)
             except discord.NotFound:
                 pass  # Ignore if command message was deleted
-            await ctx.send(f"{type(exc).__name__} occured. Check your code.")
+            await ctx.send(f"{type(exc).__name__} occurred. Check your code.")
             return
 
         func = env["func"]
@@ -346,7 +346,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
                 await ctx.message.add_reaction(botto.CROSS)
             except discord.NotFound:
                 pass  # Ignore if command message was deleted
-            await ctx.send(f"{type(exc).__name__} occured.\n{str(exc)}")
+            await ctx.send(f"{type(exc).__name__} occurred.\n{str(exc)}")
             return
 
         # When code execution is successful
@@ -366,7 +366,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
 
         # If there is stdout and return value
         embed: discord.Embed = discord.Embed(
-            timestamp=ctx.message.created_at, colour=botto.config["MAIN_COLOUR"]
+            timestamp=ctx.message.created_at, color=botto.config["MAIN_COLOR"]
         )
         embed.set_author(name="Code Evaluation")
         embed.set_footer(text=f"Took {delta:.2f} ms with Python {platform.python_version()}")
