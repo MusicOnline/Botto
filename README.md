@@ -1,5 +1,4 @@
-Botto
-=====
+# Botto
 
 ![Python][python-shield]
 [![discord.py][discordpy-shield]][discordpy-url]
@@ -8,9 +7,9 @@ Botto
 [![Commits][commits-shield]][commits-url]
 [![Discord][discord-shield]][discord-url]
 
-[python-shield]: https://img.shields.io/badge/python-3.7-blue.svg
-[discordpy-shield]: https://img.shields.io/badge/discord.py-1.2.5-g
-[discordpy-url]: https://github.com/Rapptz/discord.py/tree/v1.2.5
+[python-shield]: https://img.shields.io/badge/python-3.7%20%7C%203.8-blue.svg
+[discordpy-shield]: https://img.shields.io/badge/discord.py-1.4.1-g
+[discordpy-url]: https://github.com/Rapptz/discord.py/tree/v1.4.1
 [license-shield]: https://img.shields.io/github/license/MusicOnline/Botto
 [license-url]: https://github.com/MusicOnline/Botto/blob/master/LICENSE
 [issues-shield]: https://img.shields.io/github/issues/MusicOnline/Botto
@@ -31,32 +30,31 @@ You can join the Discord server for support using this template.
 
 ### Requirements
 
-- Python 3.7 and above
+-   Python 3.7 and above
 
 ### Installation
 
 1. Fork this repository.
 
 2. Run this command in your command line:
-   ```bash
-   git clone https://github.com/{YOUR_USERNAME}/Botto.git
-   ```
-   If your machine does not have git, you may download it [here](https://git-scm.com/download/win).
+
+    ```bash
+    git clone https://github.com/{YOUR_USERNAME}/Botto.git
+    ```
+
+    If your machine does not have git, you may download it [here](https://git-scm.com/download/win).
 
 3. Start hacking.
-
 
 ### Usage
 
 1. Copy `config-example.yml` to `config.yml` in the same directory.
-   
 2. Fill up all necessary configuration values.
-   
 3. Run this command in your command line:
-   ```bash
-   python -m botto
-   ```
-   Your bot should be online now.
+    ```bash
+    python -m botto
+    ```
+    Your bot should be online now.
 
 ## Contributing
 
