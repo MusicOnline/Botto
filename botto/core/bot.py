@@ -111,7 +111,8 @@ class Botto(commands.AutoShardedBot):
         self.pool: asyncpg.Pool = await asyncpg.create_pool(dsn)  # pylint: disable=no-member
         if not hasattr(self, "jinja_env"):
             self.jinja_env = jinja2.Environment(
-                loader=jinja2.FileSystemLoader("botto/sql"), line_statement_prefix="-- :",
+                loader=jinja2.FileSystemLoader("botto/sql"),
+                line_statement_prefix="-- :",
             )
 
     def get_queries(self, template_name: str) -> Any:

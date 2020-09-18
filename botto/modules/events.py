@@ -48,7 +48,9 @@ class Events(commands.Cog):
         line = f"Joined guild named '{guild}' (ID: {guild.id})."
         logger.info(line)
         embed: discord.Embed = discord.Embed(
-            color=discord.Color.green(), timestamp=datetime.datetime.utcnow(), description=line,
+            color=discord.Color.green(),
+            timestamp=datetime.datetime.utcnow(),
+            description=line,
         )
         await self.bot.send_console(embed=embed)
 
@@ -57,7 +59,9 @@ class Events(commands.Cog):
         line = f"Removed from guild named '{guild}' (ID: {guild.id})."
         logger.info(line)
         embed: discord.Embed = discord.Embed(
-            color=discord.Color.gold(), timestamp=datetime.datetime.utcnow(), description=line,
+            color=discord.Color.gold(),
+            timestamp=datetime.datetime.utcnow(),
+            description=line,
         )
         await self.bot.send_console(embed=embed)
 
@@ -196,7 +200,9 @@ class Events(commands.Cog):
         embed.set_author(name=f"Unexpected Exception - {type(error).__name__}")
         embed.set_footer(text=f"From command '{ctx.command}'")
         embed.add_field(
-            name="Command Caller", value=f"{ctx.author} `({ctx.author.id})`", inline=False,
+            name="Command Caller",
+            value=f"{ctx.author} `({ctx.author.id})`",
+            inline=False,
         )
         if ctx.guild:
             embed.add_field(
@@ -209,7 +215,9 @@ class Events(commands.Cog):
             )
         else:
             embed.add_field(
-                name="Call Origin", value=f"From DM channel `({ctx.channel.id})`", inline=False,
+                name="Call Origin",
+                value=f"From DM channel `({ctx.channel.id})`",
+                inline=False,
             )
         embed.add_field(
             name="Call Message",

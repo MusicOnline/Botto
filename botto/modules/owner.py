@@ -293,7 +293,9 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             is_uploaded = True
 
         embed: discord.Embed = discord.Embed(
-            description=result_string, timestamp=timestamp, color=botto.config["MAIN_COLOR"],
+            description=result_string,
+            timestamp=timestamp,
+            color=botto.config["MAIN_COLOR"],
         )
         embed.set_author(name="Shell Command Results")
         embed.set_footer(text=f"Took {delta:.2f} ms")

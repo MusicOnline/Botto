@@ -51,7 +51,10 @@ class Context(commands.Context):
             return f"https://mystb.in/{response['key']}"
 
     async def gist(
-        self, *files: Tuple[str, str], description: Optional[str] = None, public: bool = False,
+        self,
+        *files: Tuple[str, str],
+        description: Optional[str] = None,
+        public: bool = False,
     ) -> str:
         """Create a GitHub gist and return the url."""
         if not config["GITHUB_TOKEN"]:
