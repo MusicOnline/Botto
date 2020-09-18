@@ -40,6 +40,9 @@ You can join the Discord server for support using this template.
 
     ```bash
     git clone https://github.com/{YOUR_USERNAME}/Botto.git
+    cd Botto
+    pip install pipenv
+    pipenv install  # prepend "python3 -m" as necessary
     ```
 
     If your machine does not have git, you may download it [here](https://git-scm.com/download/win).
@@ -52,11 +55,11 @@ You can join the Discord server for support using this template.
 2. Fill up all necessary configuration values.
 3. Run this command in your command line:
     ```bash
-    python -m botto
+    pipenv run python -m botto  # prepend "python3 -m" as necessary
     ```
     Your bot should be online now.
 
 ## Contributing
 
 Contributions are always welcome.
-Please note that I use the black formatter to format my code, with its default line length limit of 88 columns. You may also open issues on the issue tracker.
+Please note that I use the black formatter to format my code, with its default line length limit of 100 columns. You may also open issues on the issue tracker.
