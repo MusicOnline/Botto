@@ -1,7 +1,0 @@
-asyncpg
-discord.py
-jinja2
-jishaku
-psutil
-pyyaml
-uvloop; sys_platform != "win32" and implementation_name == "cpython"

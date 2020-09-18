@@ -1,8 +1,9 @@
 FROM python:3.7-buster
 
 WORKDIR /usr/local/src/botto_app
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install pipenv
+COPY Pipfile Pipfile
+RUN pipenv install
 COPY . .
 
-CMD [ "python", "-m", "botto" ]
+CMD [ "pipenv", "run", "python", "-m", "botto" ]

@@ -1,0 +1,23 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+black = "*"
+flake8 = "*"
+mypy = "*"
+pylint = "*"
+
+[packages]
+asyncpg = "~=0.21"
+discord.py = "~=1.4"
+jinja2 = "~=2.11"
+jishaku = "~=1.19"
+psutil = "~=5.7"
+pyyaml = "~=5.3"
+uvloop = {version = "~=0.14", sys_platform = "!= 'win32'", implementation_name = "== 'cpython'"}
+
+
+[pipenv]
+allow_prereleases = true

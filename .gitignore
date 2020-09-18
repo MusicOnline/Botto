@@ -1,4 +1,5 @@
 /config.yml
+Pipfile.lock
 
 *.pyc
 *.log

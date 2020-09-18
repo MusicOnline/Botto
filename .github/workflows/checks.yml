@@ -16,22 +16,26 @@ jobs:
               uses: actions/setup-python@v2
               with:
                   python-version: 3.8
-            - name: Install dependencies
+            - name: Install dependencies and setup
               run: |
                   python -m pip install --upgrade pip
-                  pip install black flake8 mypy pylint
-                  pip install -r requirements.txt
+                  python -m pip install pipenv
+                  pipenv install --dev
             - name: Lint with flake8
+              if: ${{ always() }}
               run: |
                   # stop the build if there are Python syntax errors or undefined names
-                  flake8 botto --count --select=E9,F63,F7,F82 --show-source --statistics
-                  flake8 botto --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
+                  pipenv run flake8 botto --count --select=E9,F63,F7,F82 --show-source --statistics
+                  pipenv run flake8 botto --count --statistics
             - name: Lint with mypy (typing)
+              if: ${{ always() }}
               run: |
-                  mypy botto
+                  pipenv run mypy botto
             - name: Lint with pylint
+              if: ${{ always() }}
               run: |
-                  pylint botto/**/*.py
+                  pipenv run pylint botto/**/*.py
             - name: Lint with black (formatting)
+              if: ${{ always() }}
               run: |
-                  black botto --check -l 100
+                  pipenv run black botto --check -l 100
