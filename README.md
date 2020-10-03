@@ -63,23 +63,23 @@ You can join the Discord server for support using this template.
 
 Discord now has [Gateway Intents][gateway-intents-docs] which help (or force) you to limit events received. Privileged intents require verification for bots in over 100 guilds. No intents are necessary to function but `*_MESSAGES` intents should be enabled to receive messages.
 
-| Configuration name         | Actual intent name             |
-| -------------------------- | ------------------------------ |
-| `GUILDS`                   | _same_                         |
-| `MEMBERS`                  | `GUILD_MEMBERS` (Privileged)   |
-| `BANS`                     | `GUILD_BANS`                   |
-| `EMOJIS`                   | `GUILD_EMOJIS`                 |
-| `INTEGRATIONS`             | `GUILD_INTEGRATIONS`           |
-| `WEBHOOKS`                 | `GUILD_WEBHOOKS`               |
-| `INVITES`                  | `GUILD_INVITES`                |
-| `VOICE_STATES`             | `GUILD_VOICE_STATES`           |
-| `PRESENCES`                | `GUILD_PRESENCES` (Privileged) |
-| `GUILD_MESSAGES`           | _same_                         |
-| `GUILD_REACTIONS`          | `GUILD_MESSAGE_REACTIONS`      |
-| `GUILD_TYPING`             | `GUILD_MESSAGE_TYPING`         |
-| `DM_MESSAGES`              | `DIRECT_MESSAGES`              |
-| `DM_REACTIONS`             | `DIRECT_MESSAGE_REACTIONS`     |
-| `DM_TYPING`                | `DIRECT_MESSAGE_TYPING`        |
+| Configuration name | Actual intent name             |
+| ------------------ | ------------------------------ |
+| `GUILDS`           | _same_                         |
+| `MEMBERS`          | `GUILD_MEMBERS` (Privileged)   |
+| `BANS`             | `GUILD_BANS`                   |
+| `EMOJIS`           | `GUILD_EMOJIS`                 |
+| `INTEGRATIONS`     | `GUILD_INTEGRATIONS`           |
+| `WEBHOOKS`         | `GUILD_WEBHOOKS`               |
+| `INVITES`          | `GUILD_INVITES`                |
+| `VOICE_STATES`     | `GUILD_VOICE_STATES`           |
+| `PRESENCES`        | `GUILD_PRESENCES` (Privileged) |
+| `GUILD_MESSAGES`   | _same_                         |
+| `GUILD_REACTIONS`  | `GUILD_MESSAGE_REACTIONS`      |
+| `GUILD_TYPING`     | `GUILD_MESSAGE_TYPING`         |
+| `DM_MESSAGES`      | `DIRECT_MESSAGES`              |
+| `DM_REACTIONS`     | `DIRECT_MESSAGE_REACTIONS`     |
+| `DM_TYPING`        | `DIRECT_MESSAGE_TYPING`        |
 
 [gateway-intents-docs]: https://discord.com/developers/docs/topics/gateway#gateway-intents
 
@@ -105,5 +105,5 @@ If enabled, the bot will send a 🗑️ `:wastebasket:` reaction when the `shell
 
 ## Contributing
 
-Contributions are always welcome.
-Please note that I use the black formatter to format my code, with its default line length limit of 100 columns. You may also open issues on the issue tracker.
+Contributions are always welcome. You may also open issues on the issue tracker.<br>
+Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for further details.
