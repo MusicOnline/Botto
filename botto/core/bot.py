@@ -39,6 +39,9 @@ class Botto(commands.AutoShardedBot):
             command_prefix=commands.when_mentioned_or(*config["PREFIXES"]),
             pm_help=False,
             owner_id=config["OWNER_ID"],
+            intents=discord.Intents(
+                **{intent.lower(): value for intent, value in config["INTENTS"].items()}
+            ),
             **kwargs,
         )
         self.ready_time: Optional[datetime.datetime] = None
@@ -81,13 +84,16 @@ class Botto(commands.AutoShardedBot):
 
         return fmt.format(d=days, h=hours, m=minutes, s=seconds)
 
-    def get_owner(self) -> discord.User:
+    async def fetch_owner(self) -> discord.User:
         if not config["OWNER_ID"]:
             raise ValueError("OWNER_ID not set in config file.")
         owner_id = config["OWNER_ID"]
         owner: Optional[discord.User] = self.get_user(owner_id)
         if owner is None:
-            raise ValueError("Could not find owner in user cache.")
+            try:
+                owner = await self.fetch_user(owner_id)
+            except discord.NotFound as exc:
+                raise ValueError("Could not fetch owner.") from exc
         return owner
 
     def get_console_channel(self) -> utils.AnyChannel:
@@ -103,7 +109,7 @@ class Botto(commands.AutoShardedBot):
         try:
             return await self.get_console_channel().send(*args, **kwargs)
         except ValueError:
-            return await self.get_owner().send(*args, **kwargs)
+            return await (await self.fetch_owner()).send(*args, **kwargs)
 
     # ------ Basic methods ------
 
