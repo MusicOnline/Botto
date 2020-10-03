@@ -75,11 +75,11 @@ Discord now has [Gateway Intents][gateway-intents-docs] which help (or force) yo
 | `VOICE_STATES`             | `GUILD_VOICE_STATES`           |
 | `PRESENCES`                | `GUILD_PRESENCES` (Privileged) |
 | `GUILD_MESSAGES`           | _same_                         |
-| `GUILD_MESSAGE_REACTIONS`  | _same_                         |
-| `GUILD_MESSAGE_TYPING`     | _same_                         |
-| `DIRECT_MESSAGES`          | _same_                         |
-| `DIRECT_MESSAGE_REACTIONS` | _same_                         |
-| `DIRECT_MESSAGE_TYPING`    | _same_                         |
+| `GUILD_REACTIONS`          | `GUILD_MESSAGE_REACTIONS`      |
+| `GUILD_TYPING`             | `GUILD_MESSAGE_TYPING`         |
+| `DM_MESSAGES`              | `DIRECT_MESSAGES`              |
+| `DM_REACTIONS`             | `DIRECT_MESSAGE_REACTIONS`     |
+| `DM_TYPING`                | `DIRECT_MESSAGE_TYPING`        |
 
 [gateway-intents-docs]: https://discord.com/developers/docs/topics/gateway#gateway-intents
 
@@ -95,11 +95,11 @@ If enabled, statistics embeds from `on_ready` events and the `botstats` command 
 
 If enabled together with the `MEMBERS` privileged intent, statistics embeds from `on_ready` events and the `botstats` command will show the number of guild members, unique users and online users the bot can see.
 
-### `GUILD_MESSAGES` and `DIRECT_MESSAGES` intents
+### `GUILD_MESSAGES` and `DM_MESSAGES` intents
 
 If enabled, the bot can read sent messages and therefore execute commands in guild text channels and DM channels respectively.
 
-### `GUILD_MESSAGE_REACTIONS` and `DIRECT_MESSAGE_REACTIONS` intents
+### `GUILD_REACTIONS` and `DM_REACTIONS` intents
 
 If enabled, the bot will send a 🗑️ `:wastebasket:` reaction when the `shell` and `eval` commands create a gist. It will listen to it for gist deletion.
 

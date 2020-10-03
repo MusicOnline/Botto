@@ -15,11 +15,11 @@ INTENTS:  # Dict[str, bool]
     VOICE_STATES: false
     PRESENCES: false  # Privileged
     GUILD_MESSAGES: true
-    GUILD_MESSAGE_REACTIONS: true
-    GUILD_MESSAGE_TYPING: false
-    DIRECT_MESSAGES: true
-    DIRECT_MESSAGE_REACTIONS: true
-    DIRECT_MESSAGE_TYPING: false
+    GUILD_REACTIONS: true
+    GUILD_TYPING: false
+    DM_MESSAGES: true
+    DM_REACTIONS: true
+    DM_TYPING: false
 
 # Database URI in the format of postgres://user:password@host:port/database
 # Leave as null if database connection not needed

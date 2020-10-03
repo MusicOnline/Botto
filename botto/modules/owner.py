@@ -302,8 +302,8 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
 
         message = await ctx.send(embed=embed)
         if is_uploaded and (
-            (ctx.guild and botto.config["INTENTS"]["GUILD_MESSAGE_REACTIONS"])
-            or (not ctx.guild and botto.config["INTENTS"]["DIRECT_MESSAGE_REACTIONS"])
+            (ctx.guild and botto.config["INTENTS"]["GUILD_REACTIONS"])
+            or (not ctx.guild and botto.config["INTENTS"]["DM_REACTIONS"])
         ):
             await message.add_reaction("\N{WASTEBASKET}")
 
@@ -422,8 +422,8 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
 
         message = await ctx.send(embed=embed, file=file)
         if uploaded_to == "github" and (
-            (ctx.guild and botto.config["INTENTS"]["GUILD_MESSAGE_REACTIONS"])
-            or (not ctx.guild and botto.config["INTENTS"]["DIRECT_MESSAGE_REACTIONS"])
+            (ctx.guild and botto.config["INTENTS"]["GUILD_REACTIONS"])
+            or (not ctx.guild and botto.config["INTENTS"]["DM_REACTIONS"])
         ):
             await message.add_reaction("\N{WASTEBASKET}")
 
