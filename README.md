@@ -59,6 +59,50 @@ You can join the Discord server for support using this template.
     ```
     Your bot should be online now.
 
+## Gateway intents
+
+Discord now has [Gateway Intents][gateway-intents-docs] which help (or force) you to limit events received. Privileged intents require verification for bots in over 100 guilds. No intents are necessary to function but `*_MESSAGES` intents should be enabled to receive messages.
+
+| Configuration name         | Actual intent name             |
+| -------------------------- | ------------------------------ |
+| `GUILDS`                   | _same_                         |
+| `MEMBERS`                  | `GUILD_MEMBERS` (Privileged)   |
+| `BANS`                     | `GUILD_BANS`                   |
+| `EMOJIS`                   | `GUILD_EMOJIS`                 |
+| `INTEGRATIONS`             | `GUILD_INTEGRATIONS`           |
+| `WEBHOOKS`                 | `GUILD_WEBHOOKS`               |
+| `INVITES`                  | `GUILD_INVITES`                |
+| `VOICE_STATES`             | `GUILD_VOICE_STATES`           |
+| `PRESENCES`                | `GUILD_PRESENCES` (Privileged) |
+| `GUILD_MESSAGES`           | _same_                         |
+| `GUILD_REACTIONS`          | `GUILD_MESSAGE_REACTIONS`      |
+| `GUILD_TYPING`             | `GUILD_MESSAGE_TYPING`         |
+| `DM_MESSAGES`              | `DIRECT_MESSAGES`              |
+| `DM_REACTIONS`             | `DIRECT_MESSAGE_REACTIONS`     |
+| `DM_TYPING`                | `DIRECT_MESSAGE_TYPING`        |
+
+[gateway-intents-docs]: https://discord.com/developers/docs/topics/gateway#gateway-intents
+
+### `GUILDS` intent
+
+If enabled, statistics embeds from `on_ready` events and the `botstats` command will show the number of guilds, text channels and voice channels the bot is in.
+
+### `MEMBERS` privileged intent
+
+If enabled, statistics embeds from `on_ready` events and the `botstats` command will show the number of guild members and unique users the bot can see. If the `PRESENCES` privileged intent is disabled, they will also show the number of bots it can see.
+
+### `PRESENCES` privileged intent
+
+If enabled together with the `MEMBERS` privileged intent, statistics embeds from `on_ready` events and the `botstats` command will show the number of guild members, unique users and online users the bot can see.
+
+### `GUILD_MESSAGES` and `DM_MESSAGES` intents
+
+If enabled, the bot can read sent messages and therefore execute commands in guild text channels and DM channels respectively.
+
+### `GUILD_REACTIONS` and `DM_REACTIONS` intents
+
+If enabled, the bot will send a 🗑️ `:wastebasket:` reaction when the `shell` and `eval` commands create a gist. It will listen to it for gist deletion.
+
 ## Contributing
 
 Contributions are always welcome.

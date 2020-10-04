@@ -14,22 +14,6 @@ class Meta(commands.Cog):
         self.bot: botto.Botto = bot
 
     def get_statistics_embed(self) -> discord.Embed:
-        total_members: int = sum(1 for m in self.bot.get_all_members())
-        total_users: int = self.bot.user_count
-        total_online: int = len(
-            {m for m in self.bot.get_all_members() if m.status is not discord.Status.offline}
-        )
-
-        text_channels: int = sum(
-            1 for channel in self.bot.get_all_channels() if isinstance(channel, discord.TextChannel)
-        )
-        voice_channels: int = sum(
-            1
-            for channel in self.bot.get_all_channels()
-            if isinstance(channel, discord.VoiceChannel)
-        )
-
-        total_guilds: int = self.bot.guild_count
         assert self.bot.ready_time is not None
         up_since: str = self.bot.ready_time.strftime("%d %b %y")
         ping: int = self.bot.ping
@@ -40,22 +24,48 @@ class Meta(commands.Cog):
         embed: discord.Embed = discord.Embed(
             color=botto.config["MAIN_COLOR"], timestamp=datetime.datetime.utcnow()
         )
-        embed.add_field(
-            name="Member Stats",
-            value=(
-                f"{total_members} total members\n"
-                f"{total_users} unique users\n"
-                f"{total_online} users online"
-            ),
-        )
-        embed.add_field(
-            name="Guild Stats",
-            value=(
-                f"{total_guilds} guilds\n"
-                f"{text_channels} text channels\n"
-                f"{voice_channels} voice channels"
-            ),
-        )
+        if botto.config["INTENTS"]["GUILDS"]:
+            total_guilds: int = self.bot.guild_count
+            text_channels: int = sum(
+                1
+                for channel in self.bot.get_all_channels()
+                if isinstance(channel, discord.TextChannel)
+            )
+            voice_channels: int = sum(
+                1
+                for channel in self.bot.get_all_channels()
+                if isinstance(channel, discord.VoiceChannel)
+            )
+            embed.add_field(
+                name="Guild Stats",
+                value=(
+                    f"{total_guilds} guilds\n"
+                    f"{text_channels} text channels\n"
+                    f"{voice_channels} voice channels"
+                ),
+            )
+        if botto.config["INTENTS"]["MEMBERS"]:
+            total_members: int = sum(1 for m in self.bot.get_all_members())
+            total_users: int = self.bot.user_count
+            extra_user_info: str
+            if botto.config["INTENTS"]["PRESENCES"]:
+                total_online: int = len(
+                    {
+                        m
+                        for m in self.bot.get_all_members()
+                        if m.status is not discord.Status.offline
+                    }
+                )
+                extra_user_info = f"{total_online} users online"
+            else:
+                total_bots: int = len({m for m in self.bot.get_all_members() if not m.bot})
+                extra_user_info = f"incl. {total_bots} bots"
+            embed.add_field(
+                name="Member Stats",
+                value=(
+                    f"{total_members} total members\n{total_users} unqiue users\n{extra_user_info}"
+                ),
+            )
         embed.add_field(
             name="Versions",
             value=(f"Python {platform.python_version()}\ndiscord.py {discord.__version__}"),

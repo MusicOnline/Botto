@@ -11,7 +11,7 @@ pylint = "*"
 
 [packages]
 asyncpg = "~=0.21"
-discord.py = "~=1.4"
+discord.py = "~=1.5"
 jinja2 = "~=2.11"
 jishaku = "~=1.19"
 psutil = "~=5.7"
