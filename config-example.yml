@@ -1,10 +1,12 @@
 # Discord API token of the bot to login
-TOKEN: token  # str
+# type: str
+TOKEN: token
 
 # Gateway intents control events the bot receives
 # Privileged gateway intents for bots in above 100 guilds require verification
 # No intents are necessary to function but *_MESSAGES intents should be enabled to receive messages
-INTENTS:  # Dict[str, bool]
+# type: Dict[str, bool]
+INTENTS:
     GUILDS: false
     MEMBERS: false  # Privileged
     BANS: false
@@ -23,41 +25,50 @@ INTENTS:  # Dict[str, bool]
 
 # Database URI in the format of postgres://user:password@host:port/database
 # Leave as null if database connection not needed
-DATABASE_URI: null  # Optional[str]
+# type: Optional[str]
+DATABASE_URI: null
 
 # Discord user ID of the bot owner
-OWNER_ID: 0  # int
+# type: int
+OWNER_ID: 0
 
 # Discord channel ID of a text channel to send "console" messages to
 # Leave as null to send the messages to the owner's DM
-CONSOLE_CHANNEL_ID: 0  # Optional[int]
+# type: Optional[int]
+CONSOLE_CHANNEL_ID: 0
 
 # Hastebin-like API for anonymous pasting
 # URL to POST to
 # Leave as null to prioritize other methods (silenty fails if all fail)
-HASTEBIN_CREATE_URL: https://mystb.in/documents  # Optional[str]
+# type: Optional[str]
+HASTEBIN_CREATE_URL: https://mystb.in/documents
 
 # URL for the user to access the paste
 # {key} placeholder is replaced with key returned by POST API
 # Leave as null to prioritize other methods (silenty fails if all fail)
-HASTEBIN_PASTE_URL: https://mystb.in/{key}  # Optional[str]
+# type: Optional[str]
+HASTEBIN_PASTE_URL: https://mystb.in/{key}
 
 # GitHub API token with gist scope for the owner module
 # Leave as null to prioritize other methods (silenty fails if all fail)
-GITHUB_TOKEN: token  # Optional[str]
+# type: Optional[str]
+GITHUB_TOKEN: token
 
 # Main color value for embeds and such
-MAIN_COLOR: 0xFFFFFF  # int
+# type: int
+MAIN_COLOR: 0xFFFFFF
 
 # Command prefixes in addition to mentions
 # Leave as [] to only use mentions
-PREFIXES:  # List[str]
+# type: List[str]
+PREFIXES:
     - "botto "
     - "bot!"
 
 # Modules to start up with
 # The bot should at least start up with jishaku to be able to load more modules
-STARTUP_MODULES:  # List[str]
+# type: List[str]
+STARTUP_MODULES:
     - jishaku
     - botto.modules.events
     - botto.modules.owner
@@ -66,14 +77,17 @@ STARTUP_MODULES:  # List[str]
 
 # For the source command
 # Leave as null to disable the command
+# type: Optional[str]
 SOURCE_CODE_URL: https://github.com/MusicOnline/Botto
 
 # For the support command
 # Leave as null to disable the command
 # The support server "https://discord.gg/wp7Wxzs" is for bot developers using Botto
 # You should set up your own support server if you make any changes to the source code
+# type: Optional[str]
 SUPPORT_SERVER_INVITE_URL: https://discord.gg/wp7Wxzs
 
 # For the vote command
 # Leave as null to disable the command
+# type: Optional[str]
 VOTE_URL: null
