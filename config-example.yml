@@ -32,8 +32,18 @@ OWNER_ID: 0  # int
 # Leave as null to send the messages to the owner's DM
 CONSOLE_CHANNEL_ID: 0  # Optional[int]
 
+# Hastebin-like API for anonymous pasting
+# URL to POST to
+# Leave as null to prioritize other methods (silenty fails if all fail)
+HASTEBIN_CREATE_URL: https://mystb.in/documents  # Optional[str]
+
+# URL for the user to access the paste
+# {key} placeholder is replaced with key returned by POST API
+# Leave as null to prioritize other methods (silenty fails if all fail)
+HASTEBIN_PASTE_URL: https://mystb.in/{key}  # Optional[str]
+
 # GitHub API token with gist scope for the owner module
-# Leave as null to use other methods to send long eval results
+# Leave as null to prioritize other methods (silenty fails if all fail)
 GITHUB_TOKEN: token  # Optional[str]
 
 # Main color value for embeds and such

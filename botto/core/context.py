@@ -1,11 +1,9 @@
 import functools
-from typing import Any, Callable, Coroutine, Dict, Optional, Tuple, Union
+from typing import Any, Callable, Coroutine, Dict, Optional, Union
 
 import aiohttp
 
 from discord.ext import commands
-
-from botto import config  # pylint: disable=cyclic-import
 
 try:
     import ujson as json
@@ -40,40 +38,6 @@ class Context(commands.Context):
     def is_locked(self) -> bool:
         """Check if the author is locked from using other commands."""
         return self.author.id in self.locked_authors
-
-    # ------ Paste posting shortcuts ------
-
-    async def mystbin(self, content: str) -> str:
-        """Create a mystbin and return the url."""
-        url: str = "https://mystb.in/documents"
-        async with self.session.post(url, data=content.encode("utf-8")) as resp:
-            response = await resp.json()
-            return f"https://mystb.in/{response['key']}"
-
-    async def gist(
-        self,
-        *files: Tuple[str, str],
-        description: Optional[str] = None,
-        public: bool = False,
-    ) -> str:
-        """Create a GitHub gist and return the url."""
-        if not config["GITHUB_TOKEN"]:
-            raise ValueError("GITHUB_TOKEN not set in config file.")
-
-        github_token = config["GITHUB_TOKEN"]
-        url: str = "https://api.github.com/gists"
-        headers: Dict[str, str]
-        headers = {"Authorization": f"token {github_token}"}
-        _files: Dict[str, Dict[str, str]]
-        _files = {file[0]: {"content": file[1]} for file in files}
-
-        data: dict = {"files": _files, "public": public}
-        if description is not None:
-            data.update(description=description)
-
-        async with self.bot.session.post(url, headers=headers, json=data) as resp:
-            response = await resp.json()
-            return response["html_url"]
 
     # ------ GET request wrappers ------
 
