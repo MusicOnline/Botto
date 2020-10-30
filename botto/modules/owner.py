@@ -137,8 +137,8 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         """DM bot logs."""
         with open("botto.log") as file:
             content: str = file.read()
-            mystbin: str = await ctx.mystbin(content)
-            await ctx.author.send(f"Logs: {mystbin}")
+            paste_url: str = await botto.utils.hastebin(content)
+            await ctx.author.send(f"Logs: {paste_url}")
             await ctx.message.add_reaction("\N{OPEN MAILBOX WITH RAISED FLAG}")
 
     @botto.command(aliases=["runas"])
@@ -285,9 +285,10 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         is_uploaded: bool = False
 
         if len(result_string) > 2048:
-            url: str = await ctx.gist(
+            url: str = await botto.utils.gist(
                 *to_upload,
                 description=(f"Shell command results from {self._get_origin(ctx)} at {timestamp}."),
+                session=self.bot.session,
             )
             result_string = f"Results too long. View them [here]({url})."
             is_uploaded = True
@@ -395,25 +396,27 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             embed.description = result_string
         else:
             try:
-                url: str = await ctx.gist(
+                url: str = await botto.utils.gist(
                     *to_upload,
                     description=(
                         f"Eval command results from {self._get_origin(ctx)} "
                         f"at {embed.timestamp}."
                     ),
+                    session=self.bot.session,
                 )
             except (aiohttp.ClientResponseError, ValueError):
                 try:
-                    url = await ctx.mystbin(
+                    url = await botto.utils.hastebin(
                         f"Eval command results from {self._get_origin(ctx)} "
-                        f"at {embed.timestamp}.\n\n{result_string[6:-4]}"
+                        f"at {embed.timestamp}.\n\n{result_string[6:-4]}",
+                        session=self.bot.session,
                     )
-                except aiohttp.ClientResponseError:
+                except (aiohttp.ClientResponseError, ValueError):
                     # If 8MB is insufficient, give up
                     file = discord.File(io.StringIO(result_string[6:-4]), "results.txt")
                     embed.description = "Results too long. View them in the file."
                 else:
-                    uploaded_to = "mystbin"
+                    uploaded_to = "hastebin"
             else:
                 uploaded_to = "github"
 

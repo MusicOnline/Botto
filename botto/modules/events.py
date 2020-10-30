@@ -185,15 +185,18 @@ class Events(commands.Cog):
 
         # Log error to console channel
         try:
-            mystbin_url = await ctx.mystbin(full_tb)
+            hastebin_url = await botto.utils.hastebin(full_tb, session=self.bot.session)
         except aiohttp.ClientResponseError:
-            mystbin_url = "Failed to create mystbin."
+            hastebin_url = "Failed to create hastebin."
+        except ValueError:
+            hastebin_url = None
+
         partial_tb: str = "".join(traceback.format_exception(*exc_info, limit=5))
         embed = discord.Embed(
             color=discord.Color.red(),
             description=(
-                f"```py\n{botto.utils.limit_str(partial_tb, 1900)}\n```\n"
-                f"Full traceback: {mystbin_url}"
+                f"```py\n{botto.utils.limit_str(partial_tb, 1900)}\n```"
+                + (f"\nFull traceback: {hastebin_url}" if hastebin_url else "")
             ),
             timestamp=ctx.message.created_at,
         )
