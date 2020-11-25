@@ -2,7 +2,8 @@ import asyncio
 import datetime
 import logging
 import signal
-from typing import Any, Generator, List, Optional
+import sys
+from typing import Any, Callable, Dict, Generator, List, Optional
 
 import aiohttp
 import asyncpg
@@ -188,6 +189,21 @@ class Botto(commands.AutoShardedBot):
             return
         await self.invoke(ctx)
 
+    @property
+    def send_api_event(self) -> Callable:
+        cog = self.get_cog("RestrictedApi")
+        return cog.send_event
+
+    @property
+    def send_api_event_with_context(self) -> Callable:
+        cog = self.get_cog("RestrictedApi")
+        return cog.send_event_with_context
+
+    @property
+    def restricted_api_ping(self) -> Optional[int]:
+        cog = self.get_cog("RestrictedApi")
+        return round(cog.latency * 1000) if cog.latency else cog.latency
+
     # ------ Checks and invocation hooks ------
 
     async def _check_fundamental_permissions(self, ctx: Context) -> bool:
@@ -268,6 +284,11 @@ class Botto(commands.AutoShardedBot):
         await self.send_console("Bot has connected.", embed=embed)
 
     async def on_error(self, event_method: str, *args: Any, **kwargs: Any) -> None:
+        if event_method.startswith("on_restricted_api"):
+            payload: Dict[str, Any] = args[0]
+            _, error, _ = sys.exc_info()
+            self.dispatch("restricted_api_event_handler_error", event_method[18:], payload, error)
+            return
         logger.exception("Unhandled exception in '%s' event handler.", event_method)
 
     # ------ Other ------
