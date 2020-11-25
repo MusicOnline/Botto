@@ -91,3 +91,8 @@ SUPPORT_SERVER_INVITE_URL: https://discord.gg/wp7Wxzs
 # Leave as null to disable the command
 # type: Optional[str]
 VOTE_URL: null
+
+# Restricted WebSocket API URL
+# Leave as null if not used or botto.modules.restricted_api module is not loaded
+# type: Optional[str]
+RESTRICTED_API_URL: null

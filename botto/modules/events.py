@@ -2,7 +2,8 @@ import asyncio
 import datetime
 import logging
 import traceback
-from typing import List
+from types import TracebackType
+from typing import List, Optional, Tuple, Type
 
 import aiohttp
 import discord
@@ -69,8 +70,43 @@ class Events(commands.Cog):
     async def on_command(self, ctx: botto.Context) -> None:
         logger.info("Command '%s' was called by %s.", ctx.command, ctx.author)
 
+    @commands.Cog.listener()
+    async def on_restricted_api_event_handler_error(
+        self, event_method: str, payload: dict, error: Exception
+    ) -> None:
+        message: Optional[discord.Message] = discord.utils.get(
+            self.bot.cached_messages, id=payload["ctx"]["message"]["id"]
+        )
+        if message is None:
+            channel: botto.utils.OptionalChannel = self.bot.get_channel(
+                payload["ctx"]["channel"]["id"]
+            )
+            if channel is not None:
+                assert isinstance(channel, (discord.DMChannel, discord.TextChannel))
+                try:
+                    message = await channel.fetch_message(payload["ctx"]["message"]["id"])
+                except discord.HTTPException:
+                    pass
+
+        if message:
+            ctx: botto.Context = await self.bot.get_context(message, cls=botto.Context)
+            await self.on_command_error(ctx, error, restricted_api_event=event_method)
+
+        logger.debug(
+            (
+                "Unhandled exception in '%s' restricted API handler "
+                "with invocation message not found. (%s: %s)"
+            ),
+            event_method,
+            type(error).__name__,
+            error,
+            exc_info=(type(error), error, error.__traceback__),
+        )
+
     @commands.Cog.listener()  # noqa: C901
-    async def on_command_error(self, ctx: botto.Context, error: Exception) -> None:
+    async def on_command_error(
+        self, ctx: botto.Context, error: Exception, restricted_api_event: Optional[str] = None
+    ) -> None:
         # error is not typehinted as commands.CommandError
         # because error.original is not one
 
@@ -151,20 +187,37 @@ class Events(commands.Cog):
                 )
                 return
 
+        if isinstance(error, botto.NotConnectedToRestrictedApi):
+            await ctx.send("This command is currently unavailable. Please try again later.")
+            return
+
         ignored = (commands.CommandNotFound, discord.Forbidden)
 
         if isinstance(error, ignored):
             return
 
-        exc_info = (type(error), error, error.__traceback__)
-        full_tb: str = "".join(traceback.format_exception(*exc_info))
-        logger.error(
-            "Unhandled exception in '%s' command. (%s: %s)",
-            ctx.command,
-            type(error).__name__,
+        exc_info: Tuple[Type[Exception], Exception, TracebackType] = (
+            type(error),
             error,
-            exc_info=exc_info,
+            error.__traceback__,
         )
+        if restricted_api_event:
+            logger.error(
+                "Unhandled exception in restricted API handler '%s' of command '%s'. (%s: %s)",
+                restricted_api_event,
+                ctx.command,
+                type(error).__name__,
+                error,
+                exc_info=exc_info,
+            )
+        else:
+            logger.error(
+                "Unhandled exception in '%s' command. (%s: %s)",
+                ctx.command,
+                type(error).__name__,
+                error,
+                exc_info=exc_info,
+            )
 
         embed: discord.Embed = discord.Embed(
             color=discord.Color.red(),
@@ -184,6 +237,8 @@ class Events(commands.Cog):
             pass
 
         # Log error to console channel
+        full_tb: str = "".join(traceback.format_exception(*exc_info))
+        hastebin_url: Optional[str]
         try:
             hastebin_url = await botto.utils.hastebin(full_tb, session=self.bot.session)
         except aiohttp.ClientResponseError:
@@ -201,7 +256,15 @@ class Events(commands.Cog):
             timestamp=ctx.message.created_at,
         )
         embed.set_author(name=f"Unexpected Exception - {type(error).__name__}")
-        embed.set_footer(text=f"From command '{ctx.command}'")
+        if restricted_api_event:
+            embed.set_footer(
+                text=(
+                    f"From restricted API handler '{restricted_api_event}' "
+                    f"of command '{ctx.command}'"
+                )
+            )
+        else:
+            embed.set_footer(text=f"From command '{ctx.command}'")
         embed.add_field(
             name="Command Caller",
             value=f"{ctx.author} `({ctx.author.id})`",

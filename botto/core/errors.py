@@ -24,3 +24,7 @@ class BotMissingFundamentalPermissions(commands.CheckFailure):
 
 class SubcommandRequired(commands.CommandError):
     pass
+
+
+class NotConnectedToRestrictedApi(Exception):
+    pass

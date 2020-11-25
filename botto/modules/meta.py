@@ -90,7 +90,10 @@ class Meta(commands.Cog):
     @botto.command()
     async def ping(self, ctx: botto.Context) -> None:
         """Show connection statistics of the bot."""
-        await ctx.send(f"ws pong: **{self.bot.ping} ms**")
+        await ctx.send(
+            f"Discord pong: **{self.bot.ping} ms**\n"
+            f"Internal bot API pong: **{self.bot.restricted_api_ping} ms**"
+        )
 
     @botto.command()
     async def uptime(self, ctx: botto.Context) -> None:
