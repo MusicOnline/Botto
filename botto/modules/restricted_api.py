@@ -80,3 +80,10 @@ class RestrictedApi(commands.Cog):
 
 def setup(bot: botto.Botto) -> None:
     bot.add_cog(RestrictedApi(bot))
+
+
+def teardown(bot: botto.Botto) -> None:
+    cog: Optional[commands.Cog] = bot.get_cog("RestrictedApi")
+    assert isinstance(cog, RestrictedApi)
+    if cog.websocket:
+        bot.loop.create_task(cog.websocket.close())
