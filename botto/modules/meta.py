@@ -14,16 +14,12 @@ class Meta(commands.Cog):
         self.bot: botto.Botto = bot
 
     def get_statistics_embed(self) -> discord.Embed:
-        assert self.bot.ready_time is not None
-        up_since: str = self.bot.ready_time.strftime("%d %b %y")
-        ping: int = self.bot.ping
-        with self.bot.process.oneshot():
-            cpu_usage: float = self.bot.process.cpu_percent()
-            ram_usage: float = self.bot.process.memory_full_info().uss / 2 ** 20
-
         embed: discord.Embed = discord.Embed(
             color=botto.config["MAIN_COLOR"], timestamp=datetime.datetime.utcnow()
         )
+        embed.set_thumbnail(url=self.bot.user.avatar_url)
+
+        # Guild Stats field (optional)
         if botto.config["INTENTS"]["GUILDS"]:
             total_guilds: int = self.bot.guild_count
             text_channels: int = sum(
@@ -44,6 +40,8 @@ class Meta(commands.Cog):
                     f"{voice_channels} voice channels"
                 ),
             )
+
+        # Member Stats field (optional)
         if botto.config["INTENTS"]["MEMBERS"]:
             total_members: int = sum(1 for m in self.bot.get_all_members())
             total_users: int = self.bot.user_count
@@ -66,18 +64,33 @@ class Meta(commands.Cog):
                     f"{total_members} total members\n{total_users} unqiue users\n{extra_user_info}"
                 ),
             )
+
+        # Versions field
         embed.add_field(
             name="Versions",
             value=(f"Python {platform.python_version()}\ndiscord.py {discord.__version__}"),
         )
+
+        # Uptime field
+        assert self.bot.ready_time is not None
+        up_since: str = self.bot.ready_time.strftime("%d %b %y")
         embed.add_field(
             name="Uptime",
             value=(f"{self.bot.humanize_uptime(brief=True)}\n(Since {up_since} UTC)"),
         )
-        embed.add_field(name="Connection", value=f"{ping} ms current")
-        embed.add_field(name="Process", value=f"{cpu_usage}% CPU\n{ram_usage:.2f} MiB")
 
-        embed.set_thumbnail(url=self.bot.user.avatar_url)
+        # Discord connection field
+        embed.add_field(name="Discord", value=f"{self.bot.ping} ms latest")
+
+        # Restricted API connection field (optional)
+        if self.bot.restricted_api_ping:
+            embed.add_field(name="Internal API", value=f"{self.bot.restricted_api_ping} ms latest")
+
+        # Process stats field
+        with self.bot.process.oneshot():
+            cpu_usage: float = self.bot.process.cpu_percent()
+            ram_usage: float = self.bot.process.memory_full_info().uss / 2 ** 20
+        embed.add_field(name="Process", value=f"{cpu_usage}% CPU\n{ram_usage:.2f} MiB")
 
         return embed
 
@@ -90,10 +103,10 @@ class Meta(commands.Cog):
     @botto.command()
     async def ping(self, ctx: botto.Context) -> None:
         """Show connection statistics of the bot."""
-        await ctx.send(
-            f"Discord pong: **{self.bot.ping} ms**\n"
-            f"Internal bot API pong: **{self.bot.restricted_api_ping} ms**"
-        )
+        text: str = f"Discord pong: **{self.bot.ping} ms**"
+        if self.bot.restricted_api_ping:
+            text += f"\nInternal bot API pong: **{self.bot.restricted_api_ping} ms**"
+        await ctx.send(text)
 
     @botto.command()
     async def uptime(self, ctx: botto.Context) -> None:

@@ -202,7 +202,7 @@ class Botto(commands.AutoShardedBot):
     @property
     def restricted_api_ping(self) -> Optional[int]:
         cog = self.get_cog("RestrictedApi")
-        return round(cog.latency * 1000) if cog.latency else cog.latency
+        return round(cog.latency * 1000) if cog and cog.latency else None
 
     # ------ Checks and invocation hooks ------
 

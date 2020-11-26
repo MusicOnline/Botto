@@ -22,7 +22,14 @@ class RestrictedApi(commands.Cog):
         self.bot: botto.Botto = bot
         self.websocket: Optional[aiohttp.ClientWebSocketResponse] = None
         self.latency: Optional[float] = None
-        self.bot.loop.create_task(self.connect_to_server())
+        self.connect_task_loop: asyncio.Task = self.bot.loop.create_task(self.connect_to_server())
+
+    def cog_unload(self) -> None:
+        self.connect_task_loop.cancel()
+        self.ping_and_get_latency.cancel()  # pylint: disable=no-member
+        if self.websocket:
+            self.bot.loop.create_task(self.websocket.close())
+            logger.info("Disconnected from restricted API.")
 
     async def connect_to_server(self) -> None:
         while not self.bot.is_closed():
@@ -37,10 +44,14 @@ class RestrictedApi(commands.Cog):
                 )
                 await asyncio.sleep(5)
                 continue
+
+            logger.info("Connected to restricted API.")
             self.ping_and_get_latency.start()  # pylint: disable=no-member
             async for msg in self.websocket:
                 data: Dict[str, Any] = json.loads(msg.data)
                 self.bot.dispatch("restricted_api_" + data["type"], data)
+            logger.info("Disconnected from restricted API.")
+
         self.ping_and_get_latency.cancel()  # pylint: disable=no-member
 
     @tasks.loop(minutes=1)
@@ -55,6 +66,11 @@ class RestrictedApi(commands.Cog):
         time_delta: float = time.perf_counter() - time_start
         self.latency = time_delta
         return time_delta
+
+    @ping_and_get_latency.after_loop
+    async def on_ping_and_get_latency_cancel(self) -> None:
+        if self.ping_and_get_latency.is_being_cancelled():  # pylint: disable=no-member
+            self.latency = None
 
     async def send_event(self, event: str, **data: Any) -> None:
         if not self.websocket:
@@ -80,10 +96,3 @@ class RestrictedApi(commands.Cog):
 
 def setup(bot: botto.Botto) -> None:
     bot.add_cog(RestrictedApi(bot))
-
-
-def teardown(bot: botto.Botto) -> None:
-    cog: Optional[commands.Cog] = bot.get_cog("RestrictedApi")
-    assert isinstance(cog, RestrictedApi)
-    if cog.websocket:
-        bot.loop.create_task(cog.websocket.close())

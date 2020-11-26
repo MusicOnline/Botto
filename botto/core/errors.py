@@ -26,5 +26,5 @@ class SubcommandRequired(commands.CommandError):
     pass
 
 
-class NotConnectedToRestrictedApi(Exception):
+class NotConnectedToRestrictedApi(commands.CommandError):
     pass
