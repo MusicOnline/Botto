@@ -9,7 +9,7 @@ from discord.ext import commands
 class Command(commands.Command):
     def help_embed(self, coro):
         if not asyncio.iscoroutinefunction(coro):
-            raise TypeError("The error handler must be a coroutine.")
+            raise TypeError("The help embed function must be a coroutine.")
 
         self._help_embed_func = coro
         return coro
@@ -18,6 +18,17 @@ class Command(commands.Command):
         if self.cog:
             return await self._help_embed_func(self.cog, helpcommand)
         return await self._help_embed_func(helpcommand)
+
+    def _ensure_assignment_on_copy(self, other):
+        # Cogs make copies of commands
+        # This needs to be overridden to keep _help_embed_func on copy
+        other = super()._ensure_assignment_on_copy(other)
+
+        try:
+            other._help_embed_func = self._help_embed_func
+        except AttributeError:
+            pass
+        return other
 
     @property
     def short_doc(self) -> str:
