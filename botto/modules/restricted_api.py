@@ -24,12 +24,15 @@ class RestrictedApi(commands.Cog):
         self.latency: Optional[float] = None
         self.connect_task_loop: asyncio.Task = self.bot.loop.create_task(self.connect_to_server())
 
-    def cog_unload(self) -> None:
+    def stop_and_disconnect(self) -> None:
         self.connect_task_loop.cancel()
         self.ping_and_get_latency.cancel()  # pylint: disable=no-member
         if self.websocket:
             self.bot.loop.create_task(self.websocket.close())
             logger.info("Disconnected from restricted API.")
+
+    def cog_unload(self) -> None:
+        self.stop_and_disconnect()
 
     async def connect_to_server(self) -> None:
         while not self.bot.is_closed():
@@ -75,7 +78,14 @@ class RestrictedApi(commands.Cog):
     async def send_event(self, event: str, **data: Any) -> None:
         if not self.websocket:
             raise botto.NotConnectedToRestrictedApi
-        await self.websocket.send_str(json.dumps(dict(type=event, **data)))
+        try:
+            await self.websocket.send_str(json.dumps(dict(type=event, **data)))
+        except RuntimeError as exc:
+            # RuntimeError: unable to perform operation on <TCPTransport closed=True reading=False
+            # 0x??? >; the handler is closed
+            self.stop_and_disconnect()
+            RestrictedApi.__init__(self, self.bot)
+            raise botto.NotConnectedToRestrictedApi from exc
 
     async def send_event_with_context(self, event: str, ctx: botto.Context, **data: Any) -> None:
         context: Dict[str, Any] = {
