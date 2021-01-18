@@ -8,8 +8,8 @@
 [![Discord][discord-shield]][discord-url]
 
 [python-shield]: https://img.shields.io/badge/python-3.7%20%7C%203.8-blue.svg
-[discordpy-shield]: https://img.shields.io/badge/discord.py-1.5.0-g
-[discordpy-url]: https://github.com/Rapptz/discord.py/tree/v1.5.0
+[discordpy-shield]: https://img.shields.io/badge/discord.py-1.6.0-g
+[discordpy-url]: https://github.com/Rapptz/discord.py/tree/v1.6.0
 [license-shield]: https://img.shields.io/github/license/MusicOnline/Botto
 [license-url]: https://github.com/MusicOnline/Botto/blob/master/LICENSE
 [issues-shield]: https://img.shields.io/github/issues/MusicOnline/Botto
