@@ -98,7 +98,7 @@ class Meta(commands.Cog):
     async def botstats(self, ctx: botto.Context) -> None:
         """Show general statistics of the bot."""
         embed: discord.Embed = self.get_statistics_embed()
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @botto.command()
     async def ping(self, ctx: botto.Context) -> None:
@@ -106,22 +106,22 @@ class Meta(commands.Cog):
         text: str = f"Discord pong: **{self.bot.ping} ms**"
         if self.bot.restricted_api_ping:
             text += f"\nInternal bot API pong: **{self.bot.restricted_api_ping} ms**"
-        await ctx.send(text)
+        await ctx.reply(text)
 
     @botto.command()
     async def uptime(self, ctx: botto.Context) -> None:
         """Show uptime of the bot."""
-        await ctx.send(f"Online since **{self.bot.humanize_uptime()}** ago.")
+        await ctx.reply(f"Online since **{self.bot.humanize_uptime()}** ago.")
 
     @botto.command()
     async def invite(self, ctx: botto.Context) -> None:
         """Show invite link of the bot."""
-        await ctx.send(f"<{discord.utils.oauth_url(ctx.me.id)}>")
+        await ctx.reply(f"<{discord.utils.oauth_url(ctx.me.id)}>")
 
     @botto.command(enabled=bool(botto.config["SOURCE_CODE_URL"]))
     async def source(self, ctx: botto.Context) -> None:
         """Show GitHub link to source code."""
-        await ctx.send(botto.config["SOURCE_CODE_URL"])
+        await ctx.reply(botto.config["SOURCE_CODE_URL"])
 
     @botto.command(
         aliases=["suggest", "feedback", "report", "contact"],
@@ -129,12 +129,12 @@ class Meta(commands.Cog):
     )
     async def support(self, ctx: botto.Context) -> None:
         """Show support server link."""
-        await ctx.send(botto.config["SUPPORT_SERVER_INVITE_URL"])
+        await ctx.reply(botto.config["SUPPORT_SERVER_INVITE_URL"])
 
     @botto.command(enabled=bool(botto.config["VOTE_URL"]))
     async def vote(self, ctx: botto.Context) -> None:
         """Support the bot by voting!"""
-        await ctx.send(botto.config["VOTE_URL"])
+        await ctx.reply(botto.config["VOTE_URL"])
 
 
 def setup(bot: botto.Botto) -> None:

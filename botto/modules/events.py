@@ -21,7 +21,12 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
-        if message.author.bot or not message.content:
+        mentions: List[str] = [f"<@{self.bot.user.id}>", f"<@!{self.bot.user.id}>"]
+        if (
+            message.author.bot
+            or message.content not in mentions
+            or not message.channel.permissions_for(self.bot.user).send_messages
+        ):
             return
         # Note: Change this if not using commands.when_mentioned_or(*prefixes).
         if botto.config["PREFIXES"]:
@@ -37,12 +42,9 @@ class Events(commands.Cog):
                 f"using the `@{self.bot.user.name} help` command."
             )
 
-        mentions: List[str] = [f"<@{self.bot.user.id}>", f"<@!{self.bot.user.id}>"]
-        if message.content in mentions:
-            try:
-                await message.channel.send("Hello! " + content)
-            except discord.Forbidden:
-                pass
+        await message.reply(
+            "Hello! " + content, allowed_mentions=discord.AllowedMentions(users=True)
+        )
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild) -> None:
@@ -115,38 +117,38 @@ class Events(commands.Cog):
 
         if isinstance(error, botto.BotMissingFundamentalPermissions):
             if error.send_messages:
-                await ctx.send(error)
+                await ctx.reply(error)
             return
 
         if isinstance(error, asyncio.TimeoutError):
-            await ctx.send("Tick tock. You took too long.")
+            await ctx.reply("Tick tock. You took too long.")
             return
 
         if isinstance(error, commands.DisabledCommand):
             if hasattr(ctx.command, "disabled_reason"):
-                await ctx.send(
+                await ctx.reply(
                     "This command has been disabled by the bot owner with the reason:\n"
                     + ctx.command.disabled_reason
                 )
             else:
-                await ctx.send("This command has been disabled by the bot owner.")
+                await ctx.reply("This command has been disabled by the bot owner.")
             return
 
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"You are on cooldown. Retry in {error.retry_after:.1} second(s).")
+            await ctx.reply(f"You are on cooldown. Retry in {error.retry_after:.1} second(s).")
             return
 
         if isinstance(error, botto.SubcommandRequired):
             help_command = self.bot.help_command.copy()
             help_command.context = ctx
-            await ctx.send(
+            await ctx.reply(
                 "Please use one of the subcommands listed below.",
                 embed=await help_command.get_command_help(ctx.command),
             )
             return
 
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(
+            await ctx.reply(
                 f"You missed the `{error.param.name}` argument. "
                 f"Here's the correct usage for the command.\n"
                 f"```\n{ctx.prefix}{ctx.command} {ctx.command.signature}\n```"
@@ -165,7 +167,7 @@ class Events(commands.Cog):
                         f'Failed to convert parameter "{param}" to a number with or '
                         f"without decimals."
                     )
-            await ctx.send(
+            await ctx.reply(
                 f"You passed a bad argument. Here's how bad it is.\n```\n{error_msg}\n```"
             )
             return
@@ -173,22 +175,24 @@ class Events(commands.Cog):
         if isinstance(error, commands.CheckFailure):
             message: str = str(error)
             if message and not message.startswith("The check functions for command"):
-                await ctx.send(message)
+                await ctx.reply(message)
             return
 
         if isinstance(error, discord.HTTPException):
             too_long = botto.utils.is_too_long_err(error)
             if too_long:
                 content_type, length = too_long
-                await ctx.send(
+                await ctx.reply(
                     f"Tried to send a message with '{content_type}' of size over "
                     f"{length} and failed. If you think this shouldn't have "
                     f"happened, please report this to the developer."
                 )
                 return
+            if botto.utils.is_bad_message_ref_err(error):
+                return
 
         if isinstance(error, botto.NotConnectedToRestrictedApi):
-            await ctx.send("This command is currently unavailable. Please try again later.")
+            await ctx.reply("This command is currently unavailable. Please try again later.")
             return
 
         ignored = (commands.CommandNotFound, discord.Forbidden)
@@ -232,7 +236,7 @@ class Events(commands.Cog):
         embed.description += "\n```"
         embed.set_author(name="Beep boop. Unhandled exception.")
         try:
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed)
         except discord.HTTPException:
             pass
 

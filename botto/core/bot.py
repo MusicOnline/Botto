@@ -43,6 +43,9 @@ class Botto(commands.AutoShardedBot):
             intents=discord.Intents(
                 **{intent.lower(): value for intent, value in config["INTENTS"].items()}
             ),
+            allowed_mentions=discord.AllowedMentions(
+                everyone=False, users=False, roles=False, replied_user=False
+            ),
             **kwargs,
         )
         self.ready_time: Optional[datetime.datetime] = None
@@ -284,10 +287,13 @@ class Botto(commands.AutoShardedBot):
         await self.send_console("Bot has connected.", embed=embed)
 
     async def on_error(self, event_method: str, *args: Any, **kwargs: Any) -> None:
+        _, error, _ = sys.exc_info()
+        assert isinstance(error, Exception)
         if event_method.startswith("on_restricted_api"):
             payload: Dict[str, Any] = args[0]
-            _, error, _ = sys.exc_info()
             self.dispatch("restricted_api_event_handler_error", event_method[18:], payload, error)
+            return
+        if utils.is_bad_message_ref_err(error):
             return
         logger.exception("Unhandled exception in '%s' event handler.", event_method)
 

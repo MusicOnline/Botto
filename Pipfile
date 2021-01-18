@@ -11,9 +11,9 @@ pylint = "*"
 
 [packages]
 asyncpg = "~=0.21"
-discord.py = "~=1.5"
+discord.py = "~=1.6"
 jinja2 = "~=2.11"
-jishaku = "~=1.19"
+jishaku = "~=1.20"
 psutil = "~=5.7"
 pyyaml = "~=5.3"
 uvloop = {version = "~=0.14", sys_platform = "!= 'win32'", implementation_name = "== 'cpython'"}

@@ -42,6 +42,11 @@ def is_too_long_err(error: Exception) -> Optional[Tuple[str, int]]:
     return None
 
 
+def is_bad_message_ref_err(error: Exception) -> bool:
+    """Check if error is caused by unknown message refrerence."""
+    return "In message_reference: Unknown message" in str(error)
+
+
 def is_conversion_err(error: Exception) -> Optional[Tuple[str, int]]:
     """Check if error is caused by generic conversion error.
 

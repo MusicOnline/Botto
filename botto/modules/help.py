@@ -62,7 +62,7 @@ class HelpCommand(commands.HelpCommand):
         messages = []
         embeds = await self.get_bot_help(mapping)
         for embed in embeds:
-            msg = await self.get_destination().send(embed=embed)
+            msg = await self.context.reply(embed=embed)
             messages.append(msg)
         return messages
 
@@ -165,7 +165,7 @@ class HelpCommand(commands.HelpCommand):
         messages = []
         embeds = await self.get_cog_help(cog)
         for embed in embeds:
-            msg = await self.get_destination().send(embed=embed)
+            msg = await self.context.reply(embed=embed)
             messages.append(msg)
         return messages
 
@@ -245,7 +245,7 @@ class HelpCommand(commands.HelpCommand):
 
     async def send_command_help(self, command: commands.Command) -> discord.Message:
         embed = await self.get_command_help(command)
-        return await self.get_destination().send(embed=embed)
+        return await self.context.reply(embed=embed)
 
     async def send_group_help(self, group: commands.Group) -> discord.Message:
         return await self.send_command_help(group)
@@ -259,7 +259,7 @@ class HelpCommand(commands.HelpCommand):
         return f"Command `{command.qualified_name}` has no subcommands."
 
     async def send_error_message(self, error: str) -> discord.Message:
-        return await self.get_destination().send(error)
+        return await self.context.reply(error)
 
 
 def setup(bot: botto.Botto) -> None:

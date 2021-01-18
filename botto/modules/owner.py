@@ -115,7 +115,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
     @botto.command()
     async def echo(self, ctx: botto.Context, *, content: str) -> None:
         """Echo a message."""
-        await ctx.send(content)
+        await ctx.reply(content)
 
     @botto.command(name="cls")
     async def clear_terminal(self, ctx: botto.Context) -> None:
@@ -124,12 +124,12 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             os.system("cls")
         else:
             os.system("clear")
-        await ctx.send("Cleared terminal buffer.")
+        await ctx.reply("Cleared terminal buffer.")
 
     @botto.command()
     async def shutdown(self, ctx: botto.Context) -> None:
         """Disconnect the bot from Discord and ends its processes."""
-        await ctx.send("Shutdown initiated.")
+        await ctx.reply("Shutdown initiated.")
         await self.bot.logout()
 
     @botto.command()
@@ -154,7 +154,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
     @botto.command()
     async def modules(self, ctx: botto.Context) -> None:
         """Show loaded modules."""
-        await ctx.send("\n".join(self.bot.extensions.keys()))
+        await ctx.reply("\n".join(self.bot.extensions.keys()))
 
     @botto.command()
     async def load(self, ctx: botto.Context, module: str) -> None:
@@ -163,7 +163,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             module = f"botto.modules.{module}"
 
         self.bot.load_extension(module)
-        await ctx.send(f"Successfully loaded '{module}' module.")
+        await ctx.reply(f"Successfully loaded '{module}' module.")
 
     @botto.command()
     async def unload(self, ctx: botto.Context, module: str) -> None:
@@ -172,7 +172,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             module = f"botto.modules.{module}"
 
         self.bot.unload_extension(module)
-        await ctx.send(f"Successfully unloaded '{module}' module.")
+        await ctx.reply(f"Successfully unloaded '{module}' module.")
 
     @botto.command()
     async def reload(self, ctx: botto.Context, module: str) -> None:
@@ -181,7 +181,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             module = f"botto.modules.{module}"
 
         self.bot.reload_extension(module)
-        await ctx.send(f"Successfully reloaded '{module}' module.")
+        await ctx.reply(f"Successfully reloaded '{module}' module.")
 
     # ------ Profile editing ------
 
@@ -194,7 +194,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
     async def username(self, ctx: botto.Context, *, name: str) -> None:
         """Change the bot's username."""
         await self.bot.user.edit(username=name)
-        await ctx.send(f"Client's username is now {self.bot.user}.")
+        await ctx.reply(f"Client's username is now {self.bot.user}.")
 
     @edit.command()
     async def avatar(self, ctx: botto.Context, *, url: Optional[str] = None) -> None:
@@ -205,11 +205,11 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         elif ctx.message.attachments:
             avatar = await ctx.get_as_bytes(ctx.message.attachments[0].url)
         if avatar is None:
-            await ctx.send("No image was passed.")
+            await ctx.reply("No image was passed.")
             return
 
         await self.bot.user.edit(avatar=avatar)
-        await ctx.send("Client's avatar has been updated.")
+        await ctx.reply("Client's avatar has been updated.")
 
     # ------ Testing errors ------
 
@@ -244,7 +244,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
 
                 await asyncio.sleep(0)
 
-        await ctx.send(f"{lines['py']} lines of Python code written.")
+        await ctx.reply(f"{lines['py']} lines of Python code written.")
 
     # ------ Eval commands ------
 
@@ -301,7 +301,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         embed.set_author(name="Shell Command Results")
         embed.set_footer(text=f"Took {delta:.2f} ms")
 
-        message = await ctx.send(embed=embed)
+        message = await ctx.reply(embed=embed)
         if is_uploaded and (
             (ctx.guild and botto.config["INTENTS"]["GUILD_REACTIONS"])
             or (not ctx.guild and botto.config["INTENTS"]["DM_REACTIONS"])
@@ -326,17 +326,20 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         code = self._cleanup_code(code)
         stdout: io.StringIO = io.StringIO()
         to_compile: str = f"async def func():\n{textwrap.indent(code, '  ')}"
+        text: str
 
         # Defining the async function.
         try:
             import_expression.exec(to_compile, env)
         except Exception as exc:  # pylint: disable=broad-except
+            text = f"{type(exc).__name__} occurred. Check your code."
             try:
                 await ctx.message.remove_reaction(botto.aLOADING, ctx.me)
                 await ctx.message.add_reaction(botto.CROSS)
             except discord.NotFound:
-                pass  # Ignore if command message was deleted
-            await ctx.send(f"{type(exc).__name__} occurred. Check your code.")
+                await ctx.send(text)
+            else:
+                await ctx.reply(text)
             return
 
         func = env["func"]
@@ -347,12 +350,14 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             with redirect_stdout(stdout):
                 ret: Any = await func()
         except Exception as exc:  # pylint: disable=broad-except
+            text = f"{type(exc).__name__} occurred.\n{str(exc)}"
             try:
                 await ctx.message.remove_reaction(botto.aLOADING, ctx.me)
                 await ctx.message.add_reaction(botto.CROSS)
             except discord.NotFound:
-                pass  # Ignore if command message was deleted
-            await ctx.send(f"{type(exc).__name__} occurred.\n{str(exc)}")
+                await ctx.send(text)
+            else:
+                await ctx.reply(text)
             return
 
         # When code execution is successful
@@ -423,7 +428,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         if uploaded_to:
             embed.description = f"Results too long. View them [here]({url})."
 
-        message = await ctx.send(embed=embed, file=file)
+        message = await ctx.reply(embed=embed, file=file)
         if uploaded_to == "github" and (
             (ctx.guild and botto.config["INTENTS"]["GUILD_REACTIONS"])
             or (not ctx.guild and botto.config["INTENTS"]["DM_REACTIONS"])
