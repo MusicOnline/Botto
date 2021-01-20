@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Match, Optional, Tuple, Union
 import aiohttp
 import discord
 
-from botto import config
+from botto import config  # pylint: disable=cyclic-import
 from .paginator import EmbedPaginator
 
 AnyChannel = Union[

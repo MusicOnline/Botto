@@ -34,6 +34,7 @@ jobs:
             - name: Lint with pylint
               if: ${{ always() }}
               run: |
+                  shopt -s globstar
                   pipenv run pylint botto/**/*.py
             - name: Lint with black (formatting)
               if: ${{ always() }}
