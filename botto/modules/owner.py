@@ -6,7 +6,6 @@ import logging
 import os
 import platform
 import re
-import shlex
 import textwrap
 import time
 from contextlib import redirect_stdout
@@ -252,15 +251,14 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
     async def shell(self, ctx: botto.Context, *, command: str) -> None:
         """Run a shell command."""
 
-        def run_shell(argv: List[str]) -> List[str]:
-            with Popen(argv, stdout=PIPE, stderr=PIPE, shell=True) as proc:
+        def run_shell(args: str) -> List[str]:
+            with Popen(args, stdout=PIPE, stderr=PIPE, shell=True) as proc:
                 return [std.decode("utf-8") for std in proc.communicate()]
 
         await ctx.message.add_reaction(botto.aLOADING)
         command = self._cleanup_code(command)
-        argv: List[str] = shlex.split(command)
         start: float = time.perf_counter()
-        stdout, stderr = await self.bot.loop.run_in_executor(None, run_shell, argv)
+        stdout, stderr = await self.bot.loop.run_in_executor(None, run_shell, command)
         delta: float = (time.perf_counter() - start) * 1000
         timestamp: datetime.datetime = ctx.message.created_at
         await ctx.message.remove_reaction(botto.aLOADING, ctx.me)
@@ -326,7 +324,6 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         code = self._cleanup_code(code)
         stdout: io.StringIO = io.StringIO()
         to_compile: str = f"async def func():\n{textwrap.indent(code, '  ')}"
-        text: str
 
         # Defining the async function.
         try:
