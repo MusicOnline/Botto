@@ -308,7 +308,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         ):
             await message.add_reaction("\N{WASTEBASKET}")
 
-    @botto.command(name="eval")  # noqa: C901
+    @botto.command(name="eval")
     async def eval_command(self, ctx: botto.Context, *, code: str) -> None:
         """Evaluate a block of code."""
         await ctx.message.add_reaction(botto.aLOADING)
@@ -332,14 +332,7 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         try:
             import_expression.exec(to_compile, env)
         except Exception as exc:  # pylint: disable=broad-except
-            text = f"{type(exc).__name__} occurred. Check your code."
-            try:
-                await ctx.message.remove_reaction(botto.aLOADING, ctx.me)
-                await ctx.message.add_reaction(botto.CROSS)
-            except discord.NotFound:
-                await ctx.send(text)
-            else:
-                await ctx.reply(text)
+            await self.send_eval_error(ctx, exc)
             return
 
         func = env["func"]
@@ -348,49 +341,61 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
         try:
             start: float = time.perf_counter()
             with redirect_stdout(stdout):
-                ret: Any = await func()
+                return_value: Any = await func()
         except Exception as exc:  # pylint: disable=broad-except
-            text = f"{type(exc).__name__} occurred.\n{str(exc)}"
-            try:
-                await ctx.message.remove_reaction(botto.aLOADING, ctx.me)
-                await ctx.message.add_reaction(botto.CROSS)
-            except discord.NotFound:
-                await ctx.send(text)
-            else:
-                await ctx.reply(text)
+            await self.send_eval_error(ctx, exc)
             return
 
         # When code execution is successful
-        delta: float = (time.perf_counter() - start) * 1000
-        value: str = stdout.getvalue()
+        time_delta: float = (time.perf_counter() - start) * 1000
+        stdout_value: str = stdout.getvalue()
 
         # Try to unreact
         try:
             await ctx.message.remove_reaction(botto.aLOADING, ctx.me)
             await ctx.message.add_reaction(botto.CHECK)
         except discord.NotFound:
-            if not value and ret is None:
-                await ctx.send(f"{ctx.author.mention} Code execution completed in {delta:.2f} ms.")
+            if not stdout_value and return_value is None:
+                await ctx.send(
+                    f"{ctx.author.mention} Code execution completed in {time_delta:.2f} ms."
+                )
 
-        if not value and ret is None:
+        if not stdout_value and return_value is None:
             return
+        if return_value is not None:
+            self._last_result = return_value
 
+        await self.reply_eval_completed(ctx, code, stdout_value, return_value, time_delta)
+
+    async def send_eval_error(self, ctx: botto.Context, exception: Exception) -> None:
+        text: str = f"{type(exception).__name__} occurred.\n{str(exception)}"
+        try:
+            await ctx.message.remove_reaction(botto.aLOADING, ctx.me)
+            await ctx.message.add_reaction(botto.CROSS)
+        except discord.NotFound:
+            await ctx.send(text)
+        else:
+            await ctx.reply(text)
+
+    async def reply_eval_completed(
+        self, ctx: botto.Context, code: str, stdout_value: str, return_value: Any, time_delta: float
+    ) -> discord.Message:
         # If there is stdout and return value
         embed: discord.Embed = discord.Embed(
             timestamp=ctx.message.created_at, color=botto.config["MAIN_COLOR"]
         )
         embed.set_author(name="Code Evaluation")
-        embed.set_footer(text=f"Took {delta:.2f} ms with Python {platform.python_version()}")
+        embed.set_footer(text=f"Took {time_delta:.2f} ms with Python {platform.python_version()}")
 
         result: List[str] = ["```py"]
         to_upload: List[Tuple[str, str]] = [("code.py", code)]
-        if value:
-            result.append(f"# stdout:\n{value}")
-            to_upload.append(("stdout.txt", value))
-        if ret is not None:
-            self._last_result = ret
-            result.append(f"# return:\n{ret!r}")
-            to_upload.append(("return.py", repr(ret)))
+        if stdout_value:
+            result.append(f"# stdout:\n{stdout_value}")
+            to_upload.append(("stdout.txt", stdout_value))
+        if return_value is not None:
+            self._last_result = return_value
+            result.append(f"# return:\n{return_value!r}")
+            to_upload.append(("return.py", repr(return_value)))
         result.append("```")
 
         result_string: str = "\n".join(result)
@@ -429,11 +434,14 @@ class Owner(commands.Cog, command_attrs=dict(hidden=True)):  # type: ignore
             embed.description = f"Results too long. View them [here]({url})."
 
         message = await ctx.reply(embed=embed, file=file)
+
         if uploaded_to == "github" and (
             (ctx.guild and botto.config["INTENTS"]["GUILD_REACTIONS"])
             or (not ctx.guild and botto.config["INTENTS"]["DM_REACTIONS"])
         ):
             await message.add_reaction("\N{WASTEBASKET}")
+
+        return message
 
 
 def setup(bot: botto.Botto) -> None:

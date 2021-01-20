@@ -123,42 +123,42 @@ class HelpCommand(commands.HelpCommand):
             )
             embed.set_author(name=cog.qualified_name)
 
-        def add_command_fields(embed: discord.Embed) -> None:
-            last_start_index = 0
-            last_content: List[str] = []
-            for i, cmd in enumerate(cmds):
-                content = f"`{self.clean_prefix}{cmd}` — {cmd.short_doc}"
-                if len("\n".join(last_content + [content])) <= 1024:
-                    last_content.append(content)
-                else:
-                    embed.add_field(
-                        name=f"Commands ({last_start_index + 1}-{i}/{len(cmds)})",
-                        value="\n".join(last_content),
-                        inline=False,
-                    )
-                    last_start_index = i
-                    last_content = [content]
-                if i == len(cmds) - 1 and last_start_index == 0:
-                    embed.add_field(name="Commands", value="\n".join(last_content), inline=False)
-                elif i == len(cmds) - 1:
-                    embed.add_field(
-                        name=f"Commands ({last_start_index + 1}-{i + 1}/{len(cmds)})",
-                        value="\n".join(last_content),
-                        inline=False,
-                    )
-
-        add_command_fields(embed)
+        self.add_command_fields(cmds, embed)
         if len(embed) > 6000 and embeds:
             embeds[0] = before
             embed = discord.Embed(
                 color=before.color, description=cog.description or discord.Embed.Empty
             )
             embed.set_author(name=cog.qualified_name)
-            add_command_fields(embed)
+            self.add_command_fields(cmds, embed)
             embeds.append(embed)
         elif not embeds:
             embeds.append(embed)
         return embeds
+
+    def add_command_fields(self, cmds: List[commands.Command], embed: discord.Embed) -> None:
+        last_start_index = 0
+        last_content: List[str] = []
+        for i, cmd in enumerate(cmds):
+            content = f"`{self.clean_prefix}{cmd}` — {cmd.short_doc}"
+            if len("\n".join(last_content + [content])) <= 1024:
+                last_content.append(content)
+            else:
+                embed.add_field(
+                    name=f"Commands ({last_start_index + 1}-{i}/{len(cmds)})",
+                    value="\n".join(last_content),
+                    inline=False,
+                )
+                last_start_index = i
+                last_content = [content]
+            if i == len(cmds) - 1 and last_start_index == 0:
+                embed.add_field(name="Commands", value="\n".join(last_content), inline=False)
+            elif i == len(cmds) - 1:
+                embed.add_field(
+                    name=f"Commands ({last_start_index + 1}-{i + 1}/{len(cmds)})",
+                    value="\n".join(last_content),
+                    inline=False,
+                )
 
     async def send_cog_help(self, cog: commands.Cog) -> List[discord.Message]:
         # cog cannot be None apparently

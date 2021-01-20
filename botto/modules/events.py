@@ -105,8 +105,9 @@ class Events(commands.Cog):
             exc_info=(type(error), error, error.__traceback__),
         )
 
-    @commands.Cog.listener()  # noqa: C901
-    async def on_command_error(
+    # Double noqa because local and GitHub Actions flake8 report it on different lines???
+    @commands.Cog.listener()  # noqa: C901  # local
+    async def on_command_error(  # noqa: C901  # GitHub Actions
         self, ctx: botto.Context, error: Exception, restricted_api_event: Optional[str] = None
     ) -> None:
         # error is not typehinted as commands.CommandError
