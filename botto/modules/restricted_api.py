@@ -1,9 +1,10 @@
 import asyncio
+import datetime
 import logging
-import time
 from typing import Any, Dict, Optional
 
 import aiohttp
+import discord
 from discord.ext import commands, tasks
 
 import botto
@@ -59,14 +60,14 @@ class RestrictedApi(commands.Cog):
 
     @tasks.loop(minutes=1)
     async def ping_and_get_latency(self) -> float:
-        time_start: float = time.perf_counter()
+        time_start: float = datetime.datetime.utcnow().timestamp()
         await self.send_event("ping", timestamp=str(time_start))
         await self.bot.wait_for(
             "restricted_api_pong",
             check=lambda payload: payload["timestamp"] == str(time_start),
             timeout=30,
         )
-        time_delta: float = time.perf_counter() - time_start
+        time_delta: float = datetime.datetime.utcnow().timestamp() - time_start
         self.latency = time_delta
         return time_delta
 
@@ -102,6 +103,49 @@ class RestrictedApi(commands.Cog):
             "message": {"id": ctx.message.id},
         }
         await self.send_event(event, ctx=context, **data)
+
+    def get_statistics_embed(self, payload: Dict[str, Any]) -> discord.Embed:
+        embed: discord.Embed = discord.Embed(
+            color=botto.config["MAIN_COLOR"], timestamp=datetime.datetime.utcnow()
+        )
+        embed.set_thumbnail(url=self.bot.user.avatar_url)
+
+        embed.add_field(name="Connection", value=f"{self.bot.restricted_api_ping} ms latest")
+        embed.add_field(
+            name="Process",
+            value=(
+                f"{payload['process']['cpu']}% CPU\n"
+                f"{payload['process']['used_ram'] / 2 ** 20:.2f} MiB"
+            ),
+        )
+        embed.add_field(
+            name="System",
+            value=(
+                f"{payload['system']['cpu']}% CPU\n"
+                f"{payload['system']['used_ram'] / 2 ** 30:.2f} of "
+                f"{payload['system']['total_ram'] / 2 ** 30:.2f} GiB"
+            ),
+        )
+
+        return embed
+
+    @botto.require_restricted_api()
+    @botto.command()
+    async def webstats(self, ctx: botto.Context) -> None:
+        """Show general statistics of the backend server and system."""
+
+        await self.bot.send_api_event_with_context("stats", ctx)
+
+    @commands.Cog.listener()
+    async def on_restricted_api_ack_stats(self, payload: dict) -> None:
+        channel: botto.utils.OptionalChannel = self.bot.get_channel(payload["ctx"]["channel"]["id"])
+        if not channel:
+            return
+        message: discord.PartialMessage = channel.get_partial_message(
+            payload["ctx"]["message"]["id"]
+        )
+        embed: discord.Embed = self.get_statistics_embed(payload)
+        await message.reply(embed=embed)
 
 
 def setup(bot: botto.Botto) -> None:
